@@ -38,7 +38,7 @@
       font-family: 'Lexend', sans-serif;
       background-color: var(--bg-main);
       color: var(--text-main);
-      font-size: 16px;
+      font-size: 15px;
       height: 100%;
       width: 100%;
       display: flex;
@@ -67,45 +67,48 @@
       }
     }
 
-    /* Thanh điều khiển tối giản siêu mỏng */
+    /* Thanh điều khiển siêu mỏng cho màn hình điện thoại nằm ngang */
     header {
       background-color: var(--bg-panel);
-      border-bottom: 2px solid var(--border-color);
-      padding: 5px 12px;
+      border-bottom: 1px solid var(--border-color);
+      padding: 2px 8px;
+      min-height: 32px;
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       z-index: 10;
       flex-shrink: 0;
+      overflow-x: auto;
     }
 
     .control-group {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       background: var(--bg-card);
-      padding: 4px 10px;
-      border-radius: 8px;
+      padding: 2px 6px;
+      border-radius: 6px;
       border: 1px solid var(--border-color);
+      flex-shrink: 0;
     }
 
     label {
       font-weight: 600;
-      font-size: 14px;
+      font-size: 12px;
       color: var(--text-muted);
       white-space: nowrap;
     }
 
     select, input[type="text"], input[type="number"] {
       font-family: 'Lexend', sans-serif;
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 500;
       color: var(--text-main);
       background-color: #FFFDF9;
-      border: 2px solid var(--border-color);
-      border-radius: 6px;
-      padding: 4px 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      padding: 2px 6px;
       outline: none;
       cursor: pointer;
     }
@@ -116,18 +119,20 @@
 
     button {
       font-family: 'Lexend', sans-serif;
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 600;
       color: #FFF;
       background-color: var(--accent-primary);
       border: none;
-      border-radius: 6px;
-      padding: 5px 10px;
+      border-radius: 5px;
+      padding: 3px 8px;
       cursor: pointer;
       transition: background 0.15s, transform 0.1s;
       display: inline-flex;
       align-items: center;
       gap: 4px;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     button:hover {
@@ -150,8 +155,8 @@
 
     button.btn-play {
       background-color: #2E7D32;
-      font-size: 15px;
-      padding: 5px 14px;
+      font-size: 13px;
+      padding: 3px 11px;
     }
 
     button.btn-play.playing {
@@ -159,21 +164,21 @@
     }
 
     button.btn-small-corner {
-      font-size: 12px;
-      padding: 4px 8px;
+      font-size: 11px;
+      padding: 2px 6px;
       background-color: #DFCCB5;
       color: var(--text-muted);
     }
 
     .value-badge {
       font-weight: 700;
-      font-size: 15px;
+      font-size: 14px;
       min-width: 60px;
       text-align: center;
       color: var(--text-main);
     }
 
-    /* Khu vực màn hình nốt rơi (Synthesia) & Bàn phím chiếm tối đa không gian */
+    /* Khu vực màn hình Khuông nhạc + Nốt rơi (Synthesia) & Bàn phím */
     .stage-container {
       flex: 1;
       min-height: 0;
@@ -212,22 +217,22 @@
       max-width: 600px;
       max-height: 80vh;
       overflow-y: auto;
-      padding: 20px;
+      padding: 18px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.25);
     }
     .phrase-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 10px;
-      margin-top: 14px;
+      gap: 8px;
+      margin-top: 12px;
     }
     .phrase-chip {
       background-color: var(--bg-card);
       color: var(--text-main);
       border: 2px solid var(--border-color);
-      padding: 8px 12px;
+      padding: 7px 10px;
       border-radius: 8px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       cursor: pointer;
       text-align: left;
@@ -241,14 +246,14 @@
     /* Bảng hiển thị đếm nhịp chờ (Count-in Overlay) */
     #countInOverlay {
       position: absolute;
-      top: 30%;
+      top: 45%;
       left: 50%;
       transform: translate(-50%, -50%);
       background: rgba(62, 39, 35, 0.92);
       color: #FFF8E7;
-      padding: 20px 40px;
-      border-radius: 16px;
-      font-size: 32px;
+      padding: 16px 32px;
+      border-radius: 14px;
+      font-size: 28px;
       font-weight: 700;
       text-align: center;
       box-shadow: 0 8px 25px rgba(0,0,0,0.25);
@@ -280,7 +285,7 @@
       max-width: 680px;
       max-height: 88vh;
       overflow-y: auto;
-      padding: 24px;
+      padding: 20px;
       box-shadow: 0 12px 32px rgba(0,0,0,0.3);
     }
 
@@ -289,39 +294,53 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 2px solid var(--border-color);
-      padding-bottom: 12px;
-      margin-bottom: 18px;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
     }
 
     .setting-row {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 10px;
-      padding: 14px 16px;
-      margin-bottom: 14px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
 
     .setting-row-inline {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
+    }
+
+    .setting-row label {
+      font-size: 14px;
+    }
+
+    .setting-row select, .setting-row input[type="text"], .setting-row input[type="number"] {
+      font-size: 14px;
+      padding: 5px 8px;
+    }
+
+    .setting-row button {
+      font-size: 14px;
+      padding: 5px 12px;
     }
 
     .pattern-table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 8px;
-      font-size: 15px;
+      font-size: 14px;
     }
 
     .pattern-table th, .pattern-table td {
       border: 1px solid var(--border-color);
-      padding: 8px 10px;
+      padding: 6px 8px;
       text-align: left;
     }
 
@@ -341,12 +360,12 @@
     </p>
   </div>
 
-  <!-- THANH ĐIỀU KHIỂN CHÍNH -->
+  <!-- THANH ĐIỀU KHIỂN CHÍNH (SIÊU MỎNG) -->
   <header>
     <div class="control-group">
       <label for="songSelect">🎵 Bài:</label>
-      <select id="songSelect" style="min-width: 180px;"></select>
-      <button class="btn-secondary btn-small-corner" id="btnOpenFolder" title="Mở file nhạc từ máy tính">📁 Mở file</button>
+      <select id="songSelect" style="min-width: 150px;"></select>
+      <button class="btn-secondary btn-small-corner" id="btnOpenFolder" title="Mở file nhạc hoặc thư mục từ máy">📁 Mở file</button>
       <input type="file" id="fileInput" multiple accept=".xml,.musicxml,.mxl" style="display:none;" />
     </div>
 
@@ -359,7 +378,7 @@
     <button class="btn-secondary" id="btnOpenSettings">⚙️ Cài đặt</button>
   </header>
 
-  <!-- MÀN HÌNH NỐT RƠI (SYNTHESIA) & BÀN PHÍM PIANO -->
+  <!-- MÀN HÌNH KHUÔNG NHẠC CHẠY NGANG + NỐT RƠI (SYNTHESIA) & BÀN PHÍM -->
   <div class="stage-container" id="stageContainer">
     <div id="countInOverlay">Chuẩn bị: 4</div>
     <canvas id="pianoCanvas"></canvas>
@@ -373,8 +392,8 @@
         <button class="btn-secondary" id="btnClosePhrases">Đóng ✕</button>
       </div>
       <div style="display:flex; gap:10px; margin-bottom:10px;">
-        <button class="btn-secondary" id="btnModalSelectAll" style="padding:6px 12px; font-size:14px;">Chọn cả bài</button>
-        <button class="btn-secondary" id="btnModalClear" style="padding:6px 12px; font-size:14px;">Xóa chọn</button>
+        <button class="btn-secondary" id="btnModalSelectAll">Chọn cả bài</button>
+        <button class="btn-secondary" id="btnModalClear">Xóa chọn</button>
         <span id="phraseInfoSummary" style="margin-left:auto; font-size:14px; align-self:center; color:var(--text-muted);">Nhịp: --</span>
       </div>
       <div class="phrase-grid" id="phraseModalGrid"></div>
@@ -387,6 +406,26 @@
       <div class="modal-header">
         <h2>⚙️ Cài đặt luyện tập</h2>
         <button class="btn-secondary" id="btnCloseSettings">Đóng ✕</button>
+      </div>
+
+      <!-- Cài đặt: Ẩn / Hiện Dòng nhạc chạy ngang & Lyric -->
+      <div class="setting-row">
+        <div class="setting-row-inline">
+          <label for="showSheetStaffSelect">🎼 Hiển thị dòng nhạc (Sheet chạy ngang):</label>
+          <select id="showSheetStaffSelect">
+            <option value="on">Hiện dòng sheet nhạc</option>
+            <option value="off">Ẩn dòng sheet nhạc</option>
+          </select>
+        </div>
+        <div class="setting-row-inline" style="margin-top:6px;">
+          <label for="showSheetLyricSelect">📝 Hiển thị lời bài hát (Lyric):</label>
+          <select id="showSheetLyricSelect">
+            <option value="both">Hiện trên cả Sheet & Nốt rơi</option>
+            <option value="falling">Chỉ hiện trên Nốt rơi</option>
+            <option value="sheet">Chỉ hiện dưới dòng Sheet</option>
+            <option value="off">Ẩn toàn bộ Lyric</option>
+          </select>
+        </div>
       </div>
 
       <!-- Cài đặt: Tốc độ BPM -->
@@ -405,7 +444,7 @@
       <div class="setting-row" id="patternControlGroup">
         <div class="setting-row-inline">
           <label for="patternSelect">🎹 Kiểu rải hợp âm tay trái:</label>
-          <select id="patternSelect" style="max-width: 300px;"></select>
+          <select id="patternSelect" style="max-width: 320px;"></select>
         </div>
       </div>
 
@@ -431,7 +470,7 @@
             <span class="value-badge" id="lyricBgOpacityDisplay">70%</span>
           </div>
         </div>
-        <div class="setting-row-inline" style="margin-top:8px;">
+        <div class="setting-row-inline" style="margin-top:6px;">
           <label for="lyricTextOpacityRange">✍️ Độ mờ chữ lyric:</label>
           <div style="display:flex; align-items:center; gap:10px;">
             <input type="range" id="lyricTextOpacityRange" min="0.2" max="1" step="0.05" value="1.0" style="cursor:pointer;" />
@@ -476,16 +515,16 @@
         </div>
       </div>
 
-      <!-- Cài đặt: Thêm quy tắc rải hợp âm -->
+      <!-- Cài đặt: Thêm quy tắc rải hợp âm (hỗ trợ cả đánh chập (3 5)) -->
       <div class="setting-row">
-        <label>➕ Tự thêm quy tắc rải hợp âm mới (Không giới hạn số nốt):</label>
+        <label>➕ Tự thêm quy tắc rải hợp âm mới (Hỗ trợ cả đánh chập trong ngoặc đơn):</label>
         <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;">
-          <input type="text" id="newPatternNotes" placeholder="Nhập chuỗi bậc, VD: 1-5-8-5-3-5-8-5" style="flex: 2; min-width: 210px;" />
+          <input type="text" id="newPatternNotes" placeholder="VD: 1 - (3 5) - 1 - (3 5) hoặc 1-5-8-5" style="flex: 2; min-width: 220px;" />
           <input type="text" id="newPatternMeters" placeholder="Gợi ý nhịp, VD: 4/4, 2/4" style="flex: 1; min-width: 140px;" />
           <button id="btnAddPattern">Thêm mẫu</button>
         </div>
         <small style="color: var(--text-muted);">
-          Quy ước: <b>1</b> = Chủ âm, <b>3</b> = Bậc 3, <b>5</b> = Bậc 5, <b>8</b> = Chủ âm cao hơn 1 quãng tám. Mỗi nốt ứng với 1 phách.
+          Quy ước: <b>1</b> = Chủ âm, <b>3</b> = Bậc 3, <b>5</b> = Bậc 5, <b>8</b> = Quãng 8. Các số trong ngoặc đơn như <b>(3 5)</b> sẽ được đánh vang lên cùng lúc.
         </small>
 
         <table class="pattern-table" id="patternTable">
@@ -504,35 +543,60 @@
 
   <script>
     /********************************************************************
-     * CÁC BIẾN TÙY CHỈNH THEO YÊU CẦU CỦA BẠN
+     * 1. CÁC BIẾN TÙY CHỈNH & CẤU HÌNH MẶC ĐỊNH
      ********************************************************************/
-    const NOTE_HEIGHT_SCALE = 0.85; 
-    const LYRIC_FONT_SIZE = 14;     
+    const NOTE_HEIGHT_SCALE = 0.85;
+    const LYRIC_FONT_SIZE = 14;
+    const STAFF_BANNER_HEIGHT = 86;
 
     let lyricBgOpacity = parseFloat(localStorage.getItem("piano_lyricBgOpacity") ?? "0.7");
     let lyricTextOpacity = parseFloat(localStorage.getItem("piano_lyricTextOpacity") ?? "1.0");
+    let showSheetStaff = (localStorage.getItem("piano_showSheetStaff") ?? "on") === "on";
+    let showLyricMode = localStorage.getItem("piano_showLyricMode") || "both";
 
     const DEFAULT_SONG_FILES = [
+      "viet-nam-toi.mxl",
       "tien-quan-ca-quoc-ca.mxl",
       "fur-elise-easy-ver.mxl"
     ];
 
     const FALLBACK_PATTERNS = [
-      { id: "p1",  name: "Mẫu 1: 1 – 3 – 5 – 3",         notes: [1, 3, 5, 3],       suggestedMeters: ["2/4", "4/4"], hint: "Nhịp 2/4, 4/4" },
-      { id: "p2",  name: "Mẫu 2: 1 – 5 – 3 – 5",         notes: [1, 5, 3, 5],       suggestedMeters: ["2/4", "4/4"], hint: "Nhịp 2/4, 4/4" },
-      { id: "p3",  name: "Mẫu 3: 1 – 5 – 8 – 5",         notes: [1, 5, 8, 5],       suggestedMeters: ["2/4", "4/4"], hint: "Nhịp 2/4, 4/4" },
-      { id: "p4",  name: "Mẫu 4: 1 – 3 – 5 – 8",         notes: [1, 3, 5, 8],       suggestedMeters: ["2/4", "4/4"], hint: "Nhịp 2/4, 4/4" },
-      { id: "p5",  name: "Mẫu 5: 1 – 5 – 8 – 3",         notes: [1, 5, 8, 3],       suggestedMeters: ["2/4", "4/4"], hint: "Nhịp 2/4, 4/4" },
-      { id: "p6",  name: "Mẫu 6: 1 – 3 – 8 – 5",         notes: [1, 3, 8, 5],       suggestedMeters: ["2/4", "4/4"], hint: "Nhịp 2/4, 4/4" },
-      { id: "p7",  name: "Mẫu 7: 1 – 5 – 3 – 8",         notes: [1, 5, 3, 8],       suggestedMeters: ["2/4", "4/4"], hint: "Nhịp 2/4, 4/4" },
-      { id: "p8",  name: "Mẫu 8: 1 – 5 – 8 – 3 – 5",     notes: [1, 5, 8, 3, 5],    suggestedMeters: ["4/4", "3/4"], hint: "Nhịp 4/4, 3/4" },
-      { id: "p9",  name: "Mẫu 9: 1 – 3 – 5 – 8 – 5 – 3", notes: [1, 3, 5, 8, 5, 3], suggestedMeters: ["3/4", "6/8"], hint: "Nhịp 3/4, 6/8" },
-      { id: "p10", name: "Mẫu 10: 1 – 5 – 3 – 5 – 8 – 5",notes: [1, 5, 3, 5, 8, 5], suggestedMeters: ["3/4", "6/8"], hint: "Nhịp 3/4, 6/8" }
+      { id: "p1",  name: "Mẫu 1: 1 – 3 – 5 – 3",           notes: [1, 3, 5, 3],           suggestedMeters: ["2/4", "4/4"], hint: "Nhịp 2/4, 4/4" },
+      { id: "p2",  name: "Mẫu 2: 1 – 5 – 3 – 5",           notes: [1, 5, 3, 5],           suggestedMeters: ["2/4", "4/4"], hint: "Nhịp 2/4, 4/4" },
+      { id: "p3",  name: "Mẫu 3: 1 – 5 – 8 – 5",           notes: [1, 5, 8, 5],           suggestedMeters: ["2/4", "4/4"], hint: "Nhịp 2/4, 4/4" },
+      { id: "p4",  name: "Mẫu 4: 1 – 3 – 5 – 8",           notes: [1, 3, 5, 8],           suggestedMeters: ["2/4", "4/4"], hint: "Nhịp 2/4, 4/4" },
+      { id: "p5",  name: "Mẫu 5: 1 – 5 – 8 – 3",           notes: [1, 5, 8, 3],           suggestedMeters: ["2/4", "4/4"], hint: "Nhịp 2/4, 4/4" },
+      { id: "p6",  name: "Mẫu 6: 1 – 3 – 8 – 5",           notes: [1, 3, 8, 5],           suggestedMeters: ["2/4", "4/4"], hint: "Nhịp 2/4, 4/4" },
+      { id: "p7",  name: "Mẫu 7: 1 – 5 – 3 – 8",           notes: [1, 5, 3, 8],           suggestedMeters: ["2/4", "4/4"], hint: "Nhịp 2/4, 4/4" },
+      { id: "p8",  name: "Mẫu 8: 1 – 5 – 8 – 3 – 5",       notes: [1, 5, 8, 3, 5],        suggestedMeters: ["4/4", "3/4"], hint: "Nhịp 4/4, 3/4" },
+      { id: "p9",  name: "Mẫu 9: 1 – 3 – 5 – 8 – 5 – 3",   notes: [1, 3, 5, 8, 5, 3],     suggestedMeters: ["3/4", "6/8"], hint: "Nhịp 3/4, 6/8" },
+      { id: "p10", name: "Mẫu 10: 1 – 5 – 3 – 5 – 8 – 5",  notes: [1, 5, 3, 5, 8, 5],     suggestedMeters: ["3/4", "6/8"], hint: "Nhịp 3/4, 6/8" },
+      { id: "p11", name: "Mẫu 11: 1 – (3 5) – 1 – (3 5)",  notes: [1, [3, 5], 1, [3, 5]], suggestedMeters: ["2/4", "4/4"], hint: "Nhịp 2/4, 4/4 (Đệm chập)" },
+      { id: "p12", name: "Mẫu 12: 1 – (3 5) – (3 5)",      notes: [1, [3, 5], [3, 5]],    suggestedMeters: ["3/4"],        hint: "Nhịp 3/4 (Valse chập)" }
     ];
 
+    /********************************************************************
+     * 2. BẢNG TRA CỨU NHẠC LÝ & VỊ TRÍ DÒNG KẺ KHUÔNG NHẠC
+     ********************************************************************/
     const STEP_TO_SEMITONE = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+    const STEP_TO_DIATONIC_IDX = { C: 0, D: 1, E: 2, F: 3, G: 4, A: 5, B: 6 };
     const SEMITONE_TO_LETTER = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"];
     const SEMITONE_TO_SOLFEGE = ["Đô", "Đô#", "Rê", "Mib", "Mi", "Fa", "Fa#", "Sol", "Lab", "La", "Sib", "Si"];
+
+    const PC_TO_DIATONIC = [
+      { stepIdx: 0, acc: "" },  // 0: C
+      { stepIdx: 0, acc: "#" }, // 1: C#
+      { stepIdx: 1, acc: "" },  // 2: D
+      { stepIdx: 2, acc: "b" }, // 3: Eb
+      { stepIdx: 2, acc: "" },  // 4: E
+      { stepIdx: 3, acc: "" },  // 5: F
+      { stepIdx: 3, acc: "#" }, // 6: F#
+      { stepIdx: 4, acc: "" },  // 7: G
+      { stepIdx: 5, acc: "b" }, // 8: Ab
+      { stepIdx: 5, acc: "" },  // 9: A
+      { stepIdx: 6, acc: "b" }, // 10: Bb
+      { stepIdx: 6, acc: "" }   // 11: B
+    ];
 
     const FIFTHS_TO_TONIC_PC = {
       "-7": 11, "-6": 6, "-5": 1, "-4": 8, "-3": 3, "-2": 10, "-1": 5,
@@ -545,6 +609,7 @@
 
     let songData = null;
     let activeNotes = [];
+    let rhChordGroupsList = []; // Lưu thông tin nhóm hợp âm tay phải & phía hiển thị Lyric cố định
     let phrases = [];
     let selectedPhraseIndices = new Set();
 
@@ -564,6 +629,9 @@
     let triggeredNotesSet = new Set();
     let lastFrameTime = 0;
 
+    /********************************************************************
+     * 3. BỘ PHÁT ÂM THANH PIANO (WEB AUDIO SYNTH)
+     ********************************************************************/
     function ensureAudioContext() {
       if (!audioCtx) {
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -583,7 +651,7 @@
       const freq = 440 * Math.pow(2, (midi - 69) / 12);
 
       const masterGain = audioCtx.createGain();
-      const maxGain = hand === "rh" ? 0.28 : 0.17;
+      const maxGain = hand === "rh" ? 0.28 : 0.16;
       masterGain.gain.setValueAtTime(0.001, now);
       masterGain.gain.linearRampToValueAtTime(maxGain, now + 0.015);
       masterGain.gain.exponentialRampToValueAtTime(maxGain * 0.4, now + 0.25);
@@ -626,6 +694,54 @@
       osc.stop(now + 0.08);
     }
 
+    /********************************************************************
+     * 4. XỬ LÝ MA TRẬN RẢI HỢP ÂM (HỖ TRỢ ĐÁNH CHẬP 1 - (3 5) - 1 - (3 5))
+     ********************************************************************/
+    function parsePatternSteps(rawInput) {
+      if (Array.isArray(rawInput)) {
+        return rawInput.map((item) => {
+          if (Array.isArray(item)) {
+            return item.map(Number).filter((n) => !isNaN(n) && n >= 1 && n <= 12);
+          }
+          if (typeof item === "string") {
+            const nums = item.trim().split(/[\s,]+/).map(Number).filter((n) => !isNaN(n) && n >= 1 && n <= 12);
+            return nums.length > 1 ? nums : (nums[0] || 1);
+          }
+          return Number(item) || 1;
+        });
+      }
+      if (typeof rawInput === "string") {
+        const steps = [];
+        const regex = /\(([^)]+)\)|(\d+)/g;
+        let match;
+        while ((match = regex.exec(rawInput)) !== null) {
+          if (match[1]) {
+            const groupNums = match[1]
+              .trim()
+              .split(/[\s,\-–]+/)
+              .map((x) => parseInt(x, 10))
+              .filter((x) => !isNaN(x) && x >= 1 && x <= 12);
+            if (groupNums.length === 1) steps.push(groupNums[0]);
+            else if (groupNums.length > 1) steps.push(groupNums);
+          } else if (match[2]) {
+            const singleNum = parseInt(match[2], 10);
+            if (!isNaN(singleNum) && singleNum >= 1 && singleNum <= 12) {
+              steps.push(singleNum);
+            }
+          }
+        }
+        return steps;
+      }
+      return [1, 3, 5, 3];
+    }
+
+    function formatPatternSteps(notesArray) {
+      const steps = parsePatternSteps(notesArray);
+      return steps
+        .map((st) => (Array.isArray(st) ? `(${st.join(" ")})` : String(st)))
+        .join(" – ");
+    }
+
     async function loadPatterns() {
       let basePatterns = [...FALLBACK_PATTERNS];
       try {
@@ -633,7 +749,10 @@
         if (res.ok) {
           const json = await res.json();
           if (Array.isArray(json) && json.length > 0) {
-            basePatterns = json;
+            basePatterns = json.map((p) => ({
+              ...p,
+              notes: parsePatternSteps(p.notes)
+            }));
           }
         }
       } catch (e) {}
@@ -643,7 +762,10 @@
         try {
           const parsed = JSON.parse(customSaved);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            basePatterns = parsed;
+            basePatterns = parsed.map((p) => ({
+              ...p,
+              notes: parsePatternSteps(p.notes)
+            }));
           }
         } catch (err) {}
       }
@@ -688,9 +810,9 @@
       patterns.forEach((p) => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td><b>${p.name}</b><br/><small>Chuỗi bậc: ${p.notes.join(" – ")}</small></td>
+          <td><b>${p.name}</b><br/><small>Chuỗi bậc: ${formatPatternSteps(p.notes)}</small></td>
           <td>${(p.suggestedMeters || []).join(", ") || "Mọi loại nhịp"}</td>
-          <td><button class="btn-secondary" data-del="${p.id}" style="padding:4px 10px; font-size:14px;">Xóa</button></td>
+          <td><button class="btn-secondary" data-del="${p.id}" style="padding:4px 10px; font-size:13px;">Xóa</button></td>
         `;
         tbody.appendChild(tr);
       });
@@ -708,8 +830,28 @@
       });
     }
 
+    /********************************************************************
+     * 5. TỰ ĐỘNG QUÉT FILE NHẠC TRONG THƯ MỤC (KHÔNG CẦN SỬA CODE)
+     ********************************************************************/
     async function initSongList() {
-      const discoveredFiles = new Set(DEFAULT_SONG_FILES);
+      const discoveredFiles = new Set();
+
+      try {
+        const dirRes = await fetch("./", { cache: "no-store" });
+        if (dirRes.ok) {
+          const htmlText = await dirRes.text();
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(htmlText, "text/html");
+          const links = Array.from(doc.querySelectorAll("a[href]"));
+          links.forEach((a) => {
+            const rawHref = decodeURIComponent(a.getAttribute("href") || "");
+            const cleanName = rawHref.split("/").filter(Boolean).pop() || "";
+            if (/\.(mxl|xml|musicxml)$/i.test(cleanName)) {
+              discoveredFiles.add(cleanName);
+            }
+          });
+        }
+      } catch (e) {}
 
       if (window.location.hostname.endsWith("github.io")) {
         try {
@@ -734,14 +876,26 @@
               }
             }
           }
-        } catch (err) {
-          console.warn("Không thể quét tự động qua GitHub API:", err);
+        } catch (err) {}
+      }
+
+      if (discoveredFiles.size === 0) {
+        for (const fName of DEFAULT_SONG_FILES) {
+          try {
+            const headRes = await fetch(encodeURI(fName), { method: "HEAD" });
+            if (headRes.ok) discoveredFiles.add(fName);
+          } catch (e) {}
         }
       }
 
-      populateSongSelect(Array.from(discoveredFiles));
-      if (discoveredFiles.size > 0) {
-        loadSelectedSong(Array.from(discoveredFiles)[0]);
+      if (discoveredFiles.size === 0) {
+        DEFAULT_SONG_FILES.forEach((f) => discoveredFiles.add(f));
+      }
+
+      const finalList = Array.from(discoveredFiles);
+      populateSongSelect(finalList);
+      if (finalList.length > 0) {
+        loadSelectedSong(finalList[0]);
       }
     }
 
@@ -756,6 +910,9 @@
       });
     }
 
+    /********************************************************************
+     * 6. GIẢI NÉN FILE .MXL & PHÂN TÍCH MUSICXML
+     ********************************************************************/
     async function extractXmlStringFromBuffer(arrayBuffer, fileName) {
       const isMxl = fileName.toLowerCase().endsWith(".mxl");
       const uint8 = new Uint8Array(arrayBuffer);
@@ -842,6 +999,7 @@
       const rawRightNotes = [];
       const rawLeftNotes = [];
       const rawRests = [];
+      const rawSheetNotes = [];
       const measuresInfo = [];
 
       let globalQuarterCursor = 0;
@@ -904,6 +1062,8 @@
             const noteStartQuarter = measureStartQuarter + (noteStartDiv / divisions);
 
             const isRest = child.querySelector("rest") !== null;
+            const noteType = child.querySelector("type")?.textContent.trim() || "";
+            const isDotted = child.querySelector("dot") !== null;
 
             if (isRest) {
               if (staffNum === 1) {
@@ -934,6 +1094,28 @@
               const tieEls = Array.from(child.querySelectorAll("tie, notations > tied"));
               const hasTieStart = tieEls.some((el) => el.getAttribute("type") === "start");
               const hasTieStop = tieEls.some((el) => el.getAttribute("type") === "stop");
+
+              const beamEl = child.querySelector("beam[number='1']") || child.querySelector("beam");
+              const beamState = beamEl ? beamEl.textContent.trim().toLowerCase() : "";
+
+              if (staffNum === 1) {
+                rawSheetNotes.push({
+                  midi,
+                  step,
+                  alter,
+                  octave,
+                  startQuarter: noteStartQuarter,
+                  durationQuarter: durQuarter,
+                  measureIndex: mIdx,
+                  noteType,
+                  isDotted,
+                  hasTieStart,
+                  hasTieStop,
+                  beamState,
+                  lyricsByVerse,
+                  lyric: ""
+                });
+              }
 
               const tieKey = `${staffNum}_${midi}`;
 
@@ -995,22 +1177,27 @@
         return keys.length >= 2 || keys.includes("2");
       });
 
-      rawRightNotes.forEach((n) => {
-        const map = n.lyricsByVerse || {};
-        const keys = Object.keys(map).sort();
-        if (keys.length === 0) {
-          n.lyric = "";
-        } else if (!hasSecondVerse || keys.length === 1) {
-          const firstKey = keys[0];
-          n.lyric = map[firstKey];
-        } else {
-          if (n.startQuarter < halfQuarter) {
-            n.lyric = map["1"] || map[keys[0]] || "";
+      function assignVerseLyric(noteList) {
+        noteList.forEach((n) => {
+          const map = n.lyricsByVerse || {};
+          const keys = Object.keys(map).sort();
+          if (keys.length === 0) {
+            n.lyric = "";
+          } else if (!hasSecondVerse || keys.length === 1) {
+            const firstKey = keys[0];
+            n.lyric = map[firstKey];
           } else {
-            n.lyric = map["2"] || map[keys[1]] || map[keys[0]] || "";
+            if (n.startQuarter < halfQuarter) {
+              n.lyric = map["1"] || map[keys[0]] || "";
+            } else {
+              n.lyric = map["2"] || map[keys[1]] || map[keys[0]] || "";
+            }
           }
-        }
-      });
+        });
+      }
+
+      assignVerseLyric(rawRightNotes);
+      assignVerseLyric(rawSheetNotes);
 
       if (parts.length >= 2 && rawLeftNotes.length === 0) {
         let p2Cursor = 0;
@@ -1065,6 +1252,7 @@
         rawRightNotes,
         rawLeftNotes,
         rawRests,
+        rawSheetNotes,
         measuresInfo
       };
 
@@ -1082,6 +1270,9 @@
       rebuildActiveNotes();
     }
 
+    /********************************************************************
+     * 7. TÁCH CÂU NHẠC & SUY RA HỢP ÂM TAY TRÁI
+     ********************************************************************/
     function buildPhrases() {
       phrases = [];
       selectedPhraseIndices.clear();
@@ -1273,7 +1464,7 @@
         });
       } else {
         const patternObj = patterns.find((p) => p.id === currentPatternId) || patterns[0];
-        const patternDegrees = patternObj ? patternObj.notes : [1, 3, 5, 3];
+        const patternSteps = patternObj ? parsePatternSteps(patternObj.notes) : [1, 3, 5, 3];
         const beatStepQuarter = songData.beatType === 8 ? 0.5 : (4 / songData.beatType);
 
         let lastChord = {
@@ -1328,13 +1519,17 @@
 
             const trialNotes = [];
             for (let b = 0; b < numBeatsInSeg; b++) {
-              const degree = patternDegrees[b % patternDegrees.length];
-              const semitoneOffset = degreeToSemitoneOffset(degree, seg.quality);
+              const stepEntry = patternSteps[b % patternSteps.length];
+              const degreesList = Array.isArray(stepEntry) ? stepEntry : [stepEntry];
               const noteStartQ = seg.startQuarter + b * beatStepQuarter;
-              trialNotes.push({
-                midi: baseRootMidi + semitoneOffset,
-                startQuarter: noteStartQ,
-                durationQuarter: beatStepQuarter * 0.92
+
+              degreesList.forEach((deg) => {
+                const semitoneOffset = degreeToSemitoneOffset(deg, seg.quality);
+                trialNotes.push({
+                  midi: baseRootMidi + semitoneOffset,
+                  startQuarter: noteStartQ,
+                  durationQuarter: beatStepQuarter * 0.92
+                });
               });
             }
 
@@ -1368,9 +1563,63 @@
         });
       }
 
-      activeNotes = generatedNotes.sort((a, b) => a.startQuarter - b.startQuarter);
+      activeNotes = generatedNotes.sort((a, b) => a.startQuarter - b.startQuarter || a.midi - b.midi);
+
+      // TÍNH CỐ ĐỊNH VỊ TRÍ Ô LYRIC MỘT LẦN DUY NHẤT (Không bao giờ nhảy trái/phải khi đang rơi)
+      const chordMap = new Map();
+      activeNotes.forEach((n) => {
+        if (n.hand !== "rh") return;
+        const key = n.startQuarter.toFixed(3);
+        if (!chordMap.has(key)) {
+          chordMap.set(key, {
+            startQuarter: n.startQuarter,
+            minMidi: n.midi,
+            maxMidi: n.midi,
+            lyric: n.lyric || "",
+            side: "right" // Mặc định luôn nằm bên phải nốt nhạc
+          });
+        } else {
+          const grp = chordMap.get(key);
+          if (n.midi < grp.minMidi) grp.minMidi = n.midi;
+          if (n.midi > grp.maxMidi) grp.maxMidi = n.midi;
+          if (n.lyric && !grp.lyric) grp.lyric = n.lyric;
+        }
+      });
+
+      rhChordGroupsList = Array.from(chordMap.values()).sort((a, b) => a.startQuarter - b.startQuarter);
+
+      // Chỉ đổi sang bên trái CỐ ĐỊNH nếu 2 nốt móc đi liền kề sát nhau (<= 0.55 phách) và nốt sau nằm ngay bên phải nốt trước
+      for (let i = 0; i < rhChordGroupsList.length; i++) {
+        const cur = rhChordGroupsList[i];
+        if (!cur.lyric) continue;
+        const next = rhChordGroupsList[i + 1];
+        if (
+          next &&
+          next.startQuarter - cur.startQuarter <= 0.55 &&
+          next.minMidi > cur.maxMidi &&
+          next.minMidi - cur.maxMidi <= 4
+        ) {
+          cur.side = "left";
+        }
+      }
+
+      // Gán thông tin nhóm hợp âm trực tiếp vào nốt đại diện (nốt cao nhất của hợp âm đó)
+      activeNotes.forEach((n) => {
+        n.lyricGroup = null;
+        if (n.hand === "rh") {
+          const key = n.startQuarter.toFixed(3);
+          const grp = chordMap.get(key);
+          if (grp && grp.lyric && n.midi === grp.maxMidi && !grp._assigned) {
+            grp._assigned = true;
+            n.lyricGroup = grp;
+          }
+        }
+      });
     }
 
+    /********************************************************************
+     * 8. VÒNG LẶP PHÁT NHẠC & ĐẾM NHỊP CHỜ
+     ********************************************************************/
     function getOrderedSelectedPhrases() {
       const indices = Array.from(selectedPhraseIndices).sort((a, b) => a - b);
       return indices.map((i) => phrases[i]).filter(Boolean);
@@ -1487,13 +1736,10 @@
     }
 
     /********************************************************************
-     * 12. VẼ GIAO DIỆN NỐT RƠI SYNTHESIA & BÀN PHÍM PIANO (CANVAS)
+     * 9. VẼ DÒNG KHUÔNG NHẠC 5 DÒNG KẺ CHẠY NGANG (SCROLLING SHEET MUSIC)
      ********************************************************************/
     const canvas = document.getElementById("pianoCanvas");
     const ctx = canvas.getContext("2d");
-
-    const MIN_MIDI = 36;
-    const MAX_MIDI = 96;
 
     function isBlackKey(midi) {
       const pc = ((midi % 12) + 12) % 12;
@@ -1510,13 +1756,380 @@
 
     function resizeCanvas() {
       const stage = document.getElementById("stageContainer");
-      canvas.width = stage.clientWidth;
-      canvas.height = stage.clientHeight;
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = stage.clientWidth * dpr;
+      canvas.height = stage.clientHeight * dpr;
+      canvas.style.width = stage.clientWidth + "px";
+      canvas.style.height = stage.clientHeight + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
+    function getSheetDiatonicInfo(rawNote) {
+      if (transposeSemitones === 0 && rawNote.step) {
+        const stepIdx = STEP_TO_DIATONIC_IDX[rawNote.step] ?? 0;
+        const acc = rawNote.alter === 1 ? "#" : (rawNote.alter === -1 ? "b" : "");
+        return {
+          diatonicStep: rawNote.octave * 7 + stepIdx,
+          acc
+        };
+      }
+      const transMidi = rawNote.midi + transposeSemitones;
+      const octave = Math.floor(transMidi / 12) - 1;
+      const pc = ((transMidi % 12) + 12) % 12;
+      const mapped = PC_TO_DIATONIC[pc];
+      return {
+        diatonicStep: octave * 7 + mapped.stepIdx,
+        acc: mapped.acc
+      };
+    }
+
+    function drawScrollingSheetStaff(width, bannerHeight) {
+      ctx.save();
+      ctx.fillStyle = "#FDF9F1";
+      ctx.fillRect(0, 0, width, bannerHeight);
+
+      ctx.strokeStyle = "#B89F82";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, bannerHeight - 1);
+      ctx.lineTo(width, bannerHeight - 1);
+      ctx.stroke();
+
+      const lineSpacing = 8;
+      const showLyricOnSheet = showLyricMode === "both" || showLyricMode === "sheet";
+      const topLineY = showLyricOnSheet ? 16 : 22;
+      const bottomLineY = topLineY + 4 * lineSpacing;
+      const playheadX = width * 0.42;
+      const pxPerQuarter = 62;
+
+      ctx.strokeStyle = "#5D4037";
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 5; i++) {
+        const ly = topLineY + i * lineSpacing;
+        ctx.beginPath();
+        ctx.moveTo(0, ly);
+        ctx.lineTo(width, ly);
+        ctx.stroke();
+      }
+
+      if (!songData) {
+        ctx.restore();
+        return;
+      }
+
+      songData.measuresInfo.forEach((m) => {
+        const barX = playheadX + (m.startQuarter - currentBeat) * pxPerQuarter;
+        if (barX >= 48 && barX <= width + 20) {
+          ctx.strokeStyle = "#4E342E";
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.moveTo(barX, topLineY);
+          ctx.lineTo(barX, bottomLineY);
+          ctx.stroke();
+
+          ctx.fillStyle = "#8D6E63";
+          ctx.font = "600 10px Lexend";
+          ctx.textAlign = "left";
+          ctx.fillText(`${m.index + 1}`, barX + 3, topLineY - 4);
+        }
+      });
+
+      const minVisibleQ = currentBeat - (playheadX / pxPerQuarter) - 2;
+      const maxVisibleQ = currentBeat + ((width - playheadX) / pxPerQuarter) + 2;
+
+      const visibleSheetNotes = songData.rawSheetNotes.filter(
+        (n) => n.startQuarter + n.durationQuarter >= minVisibleQ && n.startQuarter <= maxVisibleQ
+      );
+
+      const chordGroupsMap = new Map();
+      visibleSheetNotes.forEach((n) => {
+        const key = n.startQuarter.toFixed(3);
+        if (!chordGroupsMap.has(key)) {
+          chordGroupsMap.set(key, {
+            startQuarter: n.startQuarter,
+            durationQuarter: n.durationQuarter,
+            measureIndex: n.measureIndex,
+            beamState: n.beamState,
+            isDotted: n.isDotted,
+            notes: [],
+            lyric: ""
+          });
+        }
+        const grp = chordGroupsMap.get(key);
+        grp.notes.push(n);
+        if (n.lyric && !grp.lyric) grp.lyric = n.lyric;
+        if (n.beamState && !grp.beamState) grp.beamState = n.beamState;
+      });
+
+      const chordGroups = Array.from(chordGroupsMap.values()).sort(
+        (a, b) => a.startQuarter - b.startQuarter
+      );
+
+      const rx = 5.2;
+      const ry = 3.8;
+
+      chordGroups.forEach((grp) => {
+        grp.x = playheadX + (grp.startQuarter - currentBeat) * pxPerQuarter;
+        grp.isActive = !isCountingIn && currentBeat >= grp.startQuarter - 0.03 && currentBeat < grp.startQuarter + grp.durationQuarter;
+
+        grp.noteItems = grp.notes.map((n) => {
+          const info = getSheetDiatonicInfo(n);
+          const y = bottomLineY - (info.diatonicStep - 30) * (lineSpacing / 2);
+          return {
+            raw: n,
+            diatonicStep: info.diatonicStep,
+            acc: info.acc,
+            y
+          };
+        }).sort((a, b) => a.diatonicStep - b.diatonicStep);
+
+        const lowestItem = grp.noteItems[0];
+        const highestItem = grp.noteItems[grp.noteItems.length - 1];
+        grp.lowestY = lowestItem.y;
+        grp.highestY = highestItem.y;
+        grp.lowestStep = lowestItem.diatonicStep;
+        grp.highestStep = highestItem.diatonicStep;
+
+        const avgStep = (grp.lowestStep + grp.highestStep) / 2;
+        grp.stemDown = avgStep >= 34;
+      });
+
+      const beamClusters = [];
+      let currentCluster = [];
+
+      chordGroups.forEach((grp) => {
+        const isEighthOrShorter = grp.durationQuarter <= 0.55;
+        if (!isEighthOrShorter) {
+          if (currentCluster.length >= 2) beamClusters.push(currentCluster);
+          currentCluster = [];
+          return;
+        }
+
+        if (currentCluster.length === 0) {
+          currentCluster.push(grp);
+        } else {
+          const prev = currentCluster[currentCluster.length - 1];
+          const gap = grp.startQuarter - (prev.startQuarter + prev.durationQuarter);
+          const sameMeasure = grp.measureIndex === prev.measureIndex;
+          const beamBreak = prev.beamState === "end" || grp.beamState === "begin";
+
+          if (sameMeasure && Math.abs(gap) < 0.08 && !beamBreak && currentCluster.length < 4) {
+            currentCluster.push(grp);
+          } else {
+            if (currentCluster.length >= 2) beamClusters.push(currentCluster);
+            currentCluster = [grp];
+          }
+        }
+      });
+      if (currentCluster.length >= 2) beamClusters.push(currentCluster);
+
+      const beamedSet = new Set();
+      beamClusters.forEach((cluster) => {
+        const stemDown = true;
+        cluster.forEach((g) => {
+          g.stemDown = stemDown;
+          beamedSet.add(g);
+        });
+      });
+
+      chordGroups.forEach((grp, gIdx) => {
+        if (grp.x < 42 || grp.x > width + 20) return;
+
+        const noteColor = grp.isActive ? "#C62828" : "#1E1410";
+        const isHollow = grp.durationQuarter >= 1.95;
+        const isWhole = grp.durationQuarter >= 3.8;
+
+        ctx.strokeStyle = "#4E342E";
+        ctx.lineWidth = 1.2;
+        if (grp.lowestStep <= 28) {
+          for (let st = 28; st >= grp.lowestStep; st -= 2) {
+            const ly = bottomLineY - (st - 30) * (lineSpacing / 2);
+            ctx.beginPath();
+            ctx.moveTo(grp.x - rx - 4, ly);
+            ctx.lineTo(grp.x + rx + 4, ly);
+            ctx.stroke();
+          }
+        }
+        if (grp.highestStep >= 40) {
+          for (let st = 40; st <= grp.highestStep; st += 2) {
+            const ly = bottomLineY - (st - 30) * (lineSpacing / 2);
+            ctx.beginPath();
+            ctx.moveTo(grp.x - rx - 4, ly);
+            ctx.lineTo(grp.x + rx + 4, ly);
+            ctx.stroke();
+          }
+        }
+
+        grp.noteItems.forEach((item) => {
+          ctx.fillStyle = noteColor;
+          ctx.strokeStyle = noteColor;
+          ctx.lineWidth = 1.6;
+
+          ctx.beginPath();
+          ctx.ellipse(grp.x, item.y, rx, ry, -0.32, 0, Math.PI * 2);
+          if (isHollow) {
+            ctx.stroke();
+          } else {
+            ctx.fill();
+          }
+
+          if (grp.isDotted) {
+            ctx.beginPath();
+            ctx.arc(grp.x + rx + 4, item.y - 1, 1.8, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          if (item.acc) {
+            ctx.font = "700 11px Lexend";
+            ctx.textAlign = "right";
+            ctx.fillText(item.acc === "#" ? "♯" : "♭", grp.x - rx - 2, item.y + 4);
+          }
+
+          if (item.raw.hasTieStart) {
+            const nextGrp = chordGroups[gIdx + 1];
+            const endX = nextGrp
+              ? nextGrp.x
+              : grp.x + grp.durationQuarter * pxPerQuarter;
+            if (endX > grp.x + 6) {
+              ctx.strokeStyle = noteColor;
+              ctx.lineWidth = 1.5;
+              ctx.beginPath();
+              const startTieX = grp.x + rx - 1;
+              const endTieX = endX - rx + 1;
+              const midTieX = (startTieX + endTieX) / 2;
+              const tieY = item.y - 3;
+              ctx.moveTo(startTieX, tieY);
+              ctx.quadraticCurveTo(midTieX, tieY - 9, endTieX, tieY);
+              ctx.stroke();
+            }
+          }
+        });
+
+        if (!beamedSet.has(grp) && !isWhole) {
+          ctx.strokeStyle = noteColor;
+          ctx.lineWidth = 1.5;
+          if (grp.stemDown) {
+            const stemX = grp.x - rx + 0.8;
+            const stemTopY = grp.highestY;
+            const stemBotY = grp.lowestY + 22;
+            ctx.beginPath();
+            ctx.moveTo(stemX, stemTopY);
+            ctx.lineTo(stemX, stemBotY);
+            ctx.stroke();
+
+            if (grp.durationQuarter <= 0.55) {
+              ctx.beginPath();
+              ctx.moveTo(stemX, stemBotY);
+              ctx.quadraticCurveTo(stemX + 8, stemBotY - 5, stemX + 6, stemBotY - 12);
+              ctx.stroke();
+            }
+          } else {
+            const stemX = grp.x + rx - 0.8;
+            const stemBotY = grp.lowestY;
+            const stemTopY = grp.highestY - 22;
+            ctx.beginPath();
+            ctx.moveTo(stemX, stemBotY);
+            ctx.lineTo(stemX, stemTopY);
+            ctx.stroke();
+
+            if (grp.durationQuarter <= 0.55) {
+              ctx.beginPath();
+              ctx.moveTo(stemX, stemTopY);
+              ctx.quadraticCurveTo(stemX + 8, stemTopY + 5, stemX + 6, stemTopY + 12);
+              ctx.stroke();
+            }
+          }
+        }
+
+        if (showLyricOnSheet && grp.lyric) {
+          ctx.font = `700 ${grp.isActive ? 13 : 12}px Lexend`;
+          ctx.fillStyle = grp.isActive
+            ? "#C62828"
+            : `rgba(62, 39, 35, ${lyricTextOpacity})`;
+          ctx.textAlign = "center";
+          ctx.fillText(grp.lyric, grp.x, bannerHeight - 6);
+        }
+      });
+
+      beamClusters.forEach((cluster) => {
+        const first = cluster[0];
+        const last = cluster[cluster.length - 1];
+        if (last.x < 42 || first.x > width + 20) return;
+
+        const firstStemX = first.x - rx + 0.8;
+        const lastStemX = last.x - rx + 0.8;
+
+        const maxLowestY = Math.max(...cluster.map((g) => g.lowestY));
+        let beamStartY = first.lowestY + 21;
+        let beamEndY = last.lowestY + 21;
+
+        const slope = Math.max(-8, Math.min(8, beamEndY - beamStartY));
+        const baseBeamY = maxLowestY + 20;
+        beamStartY = baseBeamY - slope / 2;
+        beamEndY = baseBeamY + slope / 2;
+
+        ctx.strokeStyle = "#1E1410";
+        ctx.lineWidth = 1.5;
+
+        cluster.forEach((g) => {
+          const sx = g.x - rx + 0.8;
+          const t = lastStemX === firstStemX ? 0 : (sx - firstStemX) / (lastStemX - firstStemX);
+          const targetBeamY = beamStartY + t * (beamEndY - beamStartY);
+          ctx.beginPath();
+          ctx.moveTo(sx, g.highestY);
+          ctx.lineTo(sx, targetBeamY);
+          ctx.stroke();
+        });
+
+        ctx.strokeStyle = "#1E1410";
+        ctx.lineWidth = 4.2;
+        ctx.beginPath();
+        ctx.moveTo(firstStemX - 0.5, beamStartY);
+        ctx.lineTo(lastStemX + 0.5, beamEndY);
+        ctx.stroke();
+      });
+
+      ctx.strokeStyle = "rgba(198, 40, 40, 0.85)";
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.moveTo(playheadX, 4);
+      ctx.lineTo(playheadX, bannerHeight - 4);
+      ctx.stroke();
+
+      ctx.fillStyle = "#C62828";
+      ctx.beginPath();
+      ctx.moveTo(playheadX - 5, 2);
+      ctx.lineTo(playheadX + 5, 2);
+      ctx.lineTo(playheadX, 9);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = "#F5E9D6";
+      ctx.fillRect(0, 0, 44, bannerHeight - 2);
+      ctx.strokeStyle = "#C7B299";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(44, 0);
+      ctx.lineTo(44, bannerHeight - 2);
+      ctx.stroke();
+
+      ctx.fillStyle = "#3E2723";
+      ctx.font = "34px serif";
+      ctx.textAlign = "center";
+      ctx.fillText("𝄞", 16, bottomLineY - 2);
+
+      ctx.font = "700 13px Lexend";
+      ctx.fillText(String(songData.beats), 34, topLineY + 13);
+      ctx.fillText(String(songData.beatType), 34, bottomLineY - 2);
+
+      ctx.restore();
+    }
+
+    /********************************************************************
+     * 10. VẼ MÀN HÌNH NỐT RƠI SYNTHESIA & BÀN PHÍM CO GIÃN TỰ ĐỘNG
+     ********************************************************************/
     function drawSynthesiaStage(timestamp) {
       if (!lastFrameTime) lastFrameTime = timestamp;
       const dt = Math.min((timestamp - lastFrameTime) / 1000, 0.1);
@@ -1527,19 +2140,43 @@
       const width = canvas.clientWidth;
       const height = canvas.clientHeight;
       const keyboardHeight = 20;
+      const topBannerH = showSheetStaff ? STAFF_BANNER_HEIGHT : 0;
       const hitLineY = height - keyboardHeight;
+      const fallingAreaHeight = Math.max(50, hitLineY - topBannerH);
 
-      // Dòng lệnh này giúp xóa sạch toàn bộ khung hình cũ, triệt tiêu hoàn toàn bóng ma khi chạy trên mobile
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       ctx.fillStyle = "#EFE4D2";
       ctx.fillRect(0, 0, width, height);
 
+      // 1. TỰ ĐỘNG QUÉT ĐÚNG QUÃNG PHÍM CẦN DÙNG
+      let minMidi = 48;
+      let maxMidi = 72;
+
+      const relevantNotes = activeNotes.filter((n) => {
+        if (handMode === "rh" && n.hand === "lh") return false;
+        if (handMode === "lh" && n.hand === "rh") return false;
+        return true;
+      });
+
+      if (relevantNotes.length > 0) {
+        let lowest = 127;
+        let highest = 0;
+        relevantNotes.forEach((n) => {
+          if (n.midi < lowest) lowest = n.midi;
+          if (n.midi > highest) highest = n.midi;
+        });
+        minMidi = lowest;
+        maxMidi = highest;
+        if (isBlackKey(minMidi)) minMidi -= 1;
+        if (isBlackKey(maxMidi)) maxMidi += 1;
+      }
+
       const whiteKeys = [];
-      for (let m = MIN_MIDI; m <= MAX_MIDI; m++) {
+      for (let m = minMidi; m <= maxMidi; m++) {
         if (!isBlackKey(m)) whiteKeys.push(m);
       }
-      const whiteKeyWidth = width / whiteKeys.length;
+      const whiteKeyWidth = width / Math.max(1, whiteKeys.length);
       const keyGeometry = {};
 
       whiteKeys.forEach((m, idx) => {
@@ -1550,7 +2187,7 @@
         };
       });
 
-      for (let m = MIN_MIDI; m <= MAX_MIDI; m++) {
+      for (let m = minMidi; m <= maxMidi; m++) {
         if (isBlackKey(m)) {
           const prevWhite = keyGeometry[m - 1];
           if (prevWhite) {
@@ -1564,45 +2201,50 @@
         }
       }
 
+      const pressedKeysMap = new Map();
+      const lyricsToDraw = [];
+
+      // Cắt vùng vẽ (Clip) cho khu vực nốt rơi để cả nốt và ô Lyric trượt mượt mà
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, topBannerH, width, fallingAreaHeight);
+      ctx.clip();
+
       ctx.strokeStyle = "rgba(109, 76, 65, 0.16)";
       ctx.lineWidth = 1;
       whiteKeys.forEach((m) => {
         if (m % 12 === 0) {
           const kx = keyGeometry[m].x;
           ctx.beginPath();
-          ctx.moveTo(kx, 0);
+          ctx.moveTo(kx, topBannerH);
           ctx.lineTo(kx, hitLineY);
           ctx.stroke();
         }
       });
 
-      // Giải pháp 1: Tăng khoảng cách dọc bằng cách giảm số phách hiển thị đồng thời xuống 6 phách
       const visibleQuarters = 6;
-      const pixelsPerQuarter = (hitLineY / visibleQuarters) * NOTE_HEIGHT_SCALE;
+      const pixelsPerQuarter = (fallingAreaHeight / visibleQuarters) * NOTE_HEIGHT_SCALE;
 
       if (songData) {
         ctx.strokeStyle = "rgba(109, 76, 65, 0.22)";
         ctx.lineWidth = 1.5;
         songData.measuresInfo.forEach((m) => {
           const dy = hitLineY - (m.startQuarter - currentBeat) * pixelsPerQuarter;
-          if (dy >= 0 && dy <= hitLineY) {
+          if (dy >= topBannerH && dy <= hitLineY) {
             ctx.beginPath();
             ctx.moveTo(0, dy);
             ctx.lineTo(width, dy);
             ctx.stroke();
 
             ctx.fillStyle = "rgba(109, 76, 65, 0.65)";
-            ctx.font = "600 13px Lexend";
+            ctx.font = "600 12px Lexend";
             ctx.textAlign = "left";
-            ctx.fillText(`Ô ${m.index + 1}`, 8, dy - 4);
+            ctx.fillText(`Ô ${m.index + 1}`, 6, dy - 3);
           }
         });
       }
 
-      const pressedKeysMap = new Map();
-      const lyricsToDraw = [];
-
-      activeNotes.forEach((n, idx) => {
+      activeNotes.forEach((n) => {
         if (handMode === "rh" && n.hand === "lh") return;
         if (handMode === "lh" && n.hand === "rh") return;
 
@@ -1617,7 +2259,7 @@
           pressedKeysMap.set(n.midi, n.hand);
         }
 
-        if (noteBottomY < 0 || noteTopY > hitLineY) return;
+        if (noteBottomY < topBannerH || noteTopY > hitLineY) return;
 
         const barColor = n.hand === "rh" ? "#1F7A68" : "#D97724";
         const borderColor = n.hand === "rh" ? "#114B3E" : "#9E500F";
@@ -1625,7 +2267,7 @@
         const pad = geom.isBlack ? 1 : 2;
         const bx = geom.x + pad;
         const bw = geom.w - pad * 2;
-        const clampedTop = Math.max(0, noteTopY);
+        const clampedTop = Math.max(topBannerH, noteTopY);
         const clampedBottom = Math.min(hitLineY, noteBottomY);
         const clampedH = Math.max(0, clampedBottom - clampedTop);
 
@@ -1635,57 +2277,81 @@
           ctx.lineWidth = 1.5;
 
           ctx.beginPath();
-          ctx.roundRect(bx, clampedTop, bw, clampedH, 6);
+          ctx.roundRect(bx, clampedTop, bw, clampedH, 5);
           ctx.fill();
           ctx.stroke();
 
-          if (clampedH >= 15) {
+          if (clampedH >= 14) {
             ctx.fillStyle = "#FFFDF9";
-            ctx.font = "700 13px Lexend";
+            ctx.font = "700 12px Lexend";
             ctx.textAlign = "center";
             const label = getNoteLabel(n.midi);
-            ctx.fillText(label, bx + bw / 2, clampedBottom - 5);
+            ctx.fillText(label, bx + bw / 2, clampedBottom - 4);
           }
 
-          if (n.lyric && n.hand === "rh") {
-            // Giải pháp 2 & 3: Tự động đổi hướng trái/phải dựa theo chỉ số nốt để tránh chồng chéo ngang
-            const side = (idx % 2 === 0) ? 'right' : 'left';
+          // Lấy thông tin Lyric đã được cố định sẵn trong rebuildActiveNotes()
+          const showLyricOnFalling = showLyricMode === "both" || showLyricMode === "falling";
+          if (showLyricOnFalling && n.lyricGroup) {
+            const grp = n.lyricGroup;
+            const minGeom = keyGeometry[grp.minMidi] || geom;
+            const maxGeom = keyGeometry[grp.maxMidi] || geom;
+
             lyricsToDraw.push({
-              text: n.lyric,
-              bx: bx,
-              bw: bw,
-              y: clampedBottom - (clampedH / 2),
-              side: side
+              text: grp.lyric,
+              leftEdgeX: minGeom.x + 2,
+              rightEdgeX: maxGeom.x + maxGeom.w - 2,
+              bottomY: clampedBottom, // Căn bằng tuyệt đối với cạnh dưới của thanh nốt nhạc
+              side: grp.side
             });
           }
         }
       });
 
-      // Vẽ chữ lyric với độ mờ nền và độ mờ chữ tùy chỉnh trong cài đặt
+      // Vẽ ô Lyric đứng yên bên cạnh thanh nốt, căn bằng cạnh dưới
       lyricsToDraw.forEach((item) => {
         ctx.font = `700 ${LYRIC_FONT_SIZE}px Lexend`;
         ctx.textAlign = "left";
         const textWidth = ctx.measureText(item.text).width;
-        
+        const boxWidth = textWidth + 8;
         const boxHeight = LYRIC_FONT_SIZE + 6;
-        const boxY = item.y - (boxHeight / 2);
-        
-        let boxX = item.side === 'right' ? (item.bx + item.bw + 4) : (item.bx - textWidth - 10);
 
-        // Nền ô lyric (độ trong suốt tùy chỉnh qua slider)
+        // Cạnh dưới của ô Lyric bằng đúng cạnh dưới của thanh nốt (item.bottomY)
+        const boxY = item.bottomY - boxHeight;
+
+        let boxX = item.side === "right"
+          ? item.rightEdgeX + 4
+          : item.leftEdgeX - boxWidth - 4;
+
+        // Chống tràn khỏi mép phải hoặc mép trái màn hình
+        if (boxX + boxWidth > width - 4) {
+          boxX = item.leftEdgeX - boxWidth - 4;
+        }
+        if (boxX < 4) {
+          boxX = item.rightEdgeX + 4;
+        }
+
         ctx.fillStyle = `rgba(253, 249, 241, ${lyricBgOpacity})`;
         ctx.strokeStyle = `rgba(141, 78, 42, ${Math.min(1, lyricBgOpacity + 0.2)})`;
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.roundRect(boxX, boxY, textWidth + 8, boxHeight, 4);
+        ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 4);
         ctx.fill();
         ctx.stroke();
 
-        // Chữ lyric (độ mờ chữ tùy chỉnh qua slider)
         ctx.fillStyle = `rgba(62, 39, 35, ${lyricTextOpacity})`;
-        ctx.fillText(item.text, boxX + 4, boxY + boxHeight - 5);
+        ctx.textBaseline = "middle";
+        ctx.fillText(item.text, boxX + 4, boxY + boxHeight / 2 + 0.5);
+        ctx.textBaseline = "alphabetic";
       });
 
+      ctx.restore(); // Kết thúc vùng clip của khu vực nốt rơi
+
+      // Vẽ dòng khuông nhạc 5 dòng kẻ chạy ngang ở phía trên (nếu bật)
+      if (showSheetStaff) {
+        drawScrollingSheetStaff(width, topBannerH);
+      }
+
+      // Vẽ bàn phím Piano ở cạnh dưới cùng
       ctx.fillStyle = "#5D4037";
       ctx.fillRect(0, hitLineY - 3, width, 4);
 
@@ -1707,14 +2373,14 @@
         ctx.strokeRect(g.x, hitLineY, g.w, keyboardHeight);
 
         ctx.fillStyle = activeHand ? "#212121" : "#5D4037";
-        ctx.font = m % 12 === 0 ? "700 13px Lexend" : "500 12px Lexend";
+        ctx.font = m % 12 === 0 ? "700 12px Lexend" : "500 11px Lexend";
         ctx.textAlign = "center";
         const octaveNum = Math.floor(m / 12) - 1;
         const noteText = m % 12 === 0 ? `${getNoteLabel(m)}${octaveNum}` : getNoteLabel(m);
-        ctx.fillText(noteText, g.x + g.w / 2, hitLineY + keyboardHeight - 2);
+        ctx.fillText(noteText, g.x + g.w / 2, hitLineY + keyboardHeight - 3);
       });
 
-      for (let m = MIN_MIDI; m <= MAX_MIDI; m++) {
+      for (let m = minMidi; m <= maxMidi; m++) {
         if (isBlackKey(m)) {
           const g = keyGeometry[m];
           if (!g) continue;
@@ -1739,7 +2405,7 @@
     }
 
     /********************************************************************
-     * 13. SỰ KIỆN NÚT BẤM, PHÍM SPACE & HIỂN THỊ TONE
+     * 11. SỰ KIỆN NÚT BẤM, PHÍM SPACE & CÀI ĐẶT
      ********************************************************************/
     function updateTempoDisplay() {
       document.getElementById("tempoDisplay").textContent = `${currentBpm} BPM`;
@@ -1776,7 +2442,8 @@
       const files = Array.from(e.target.files).filter((f) => /\.(mxl|xml|musicxml)$/i.test(f.name));
       if (files.length === 0) return;
       files.forEach((f) => localFilesMap.set(f.name, f));
-      const allNames = Array.from(new Set([...DEFAULT_SONG_FILES, ...localFilesMap.keys()]));
+      const currentOptions = Array.from(document.getElementById("songSelect").options).map((o) => o.value);
+      const allNames = Array.from(new Set([...currentOptions, ...localFilesMap.keys()]));
       populateSongSelect(allNames);
       document.getElementById("songSelect").value = files[0].name;
       loadSelectedSong(files[0].name);
@@ -1838,7 +2505,6 @@
       rebuildActiveNotes();
     });
 
-    // Quản lý Modal Chọn câu tập
     const phrasesModal = document.getElementById("phrasesModal");
     document.getElementById("btnOpenPhrases").addEventListener("click", () => {
       phrasesModal.classList.add("open");
@@ -1859,7 +2525,6 @@
       resetCursorToFirstSelectedPhrase();
     });
 
-    // Quản lý Modal Cài đặt
     const settingsModal = document.getElementById("settingsModal");
     document.getElementById("btnOpenSettings").addEventListener("click", () => {
       settingsModal.classList.add("open");
@@ -1868,7 +2533,20 @@
       settingsModal.classList.remove("open");
     });
 
-    // Điều khiển độ mờ nền ô lyric
+    const showSheetStaffSelect = document.getElementById("showSheetStaffSelect");
+    showSheetStaffSelect.value = showSheetStaff ? "on" : "off";
+    showSheetStaffSelect.addEventListener("change", (e) => {
+      showSheetStaff = e.target.value === "on";
+      localStorage.setItem("piano_showSheetStaff", e.target.value);
+    });
+
+    const showSheetLyricSelect = document.getElementById("showSheetLyricSelect");
+    showSheetLyricSelect.value = showLyricMode;
+    showSheetLyricSelect.addEventListener("change", (e) => {
+      showLyricMode = e.target.value;
+      localStorage.setItem("piano_showLyricMode", showLyricMode);
+    });
+
     const lyricBgOpacityRange = document.getElementById("lyricBgOpacityRange");
     const lyricBgOpacityDisplay = document.getElementById("lyricBgOpacityDisplay");
     lyricBgOpacityRange.value = lyricBgOpacity;
@@ -1879,7 +2557,6 @@
       localStorage.setItem("piano_lyricBgOpacity", String(lyricBgOpacity));
     });
 
-    // Điều khiển độ mờ chữ lyric
     const lyricTextOpacityRange = document.getElementById("lyricTextOpacityRange");
     const lyricTextOpacityDisplay = document.getElementById("lyricTextOpacityDisplay");
     lyricTextOpacityRange.value = lyricTextOpacity;
@@ -1919,13 +2596,10 @@
       const rawNotes = document.getElementById("newPatternNotes").value.trim();
       const rawMeters = document.getElementById("newPatternMeters").value.trim();
 
-      const parsedNotes = rawNotes
-        .split(/[\s,\-–]+/)
-        .map((x) => parseInt(x, 10))
-        .filter((x) => !isNaN(x) && x >= 1 && x <= 12);
+      const parsedSteps = parsePatternSteps(rawNotes);
 
-      if (parsedNotes.length < 2) {
-        alert("Vui lòng nhập ít nhất 2 nốt hợp lệ (ví dụ: 1-5-8-5-3-5-8-5)!");
+      if (parsedSteps.length < 2) {
+        alert("Vui lòng nhập ít nhất 2 phách hợp lệ (ví dụ: 1 - (3 5) - 1 - (3 5) hoặc 1-5-8-5)!");
         return;
       }
 
@@ -1934,11 +2608,11 @@
         : [];
 
       const newId = "custom_" + Date.now();
-      const displaySeq = parsedNotes.join(" – ");
+      const displaySeq = formatPatternSteps(parsedSteps);
       patterns.push({
         id: newId,
         name: `Tự tạo: ${displaySeq}`,
-        notes: parsedNotes,
+        notes: parsedSteps,
         suggestedMeters: meters,
         hint: meters.length > 0 ? `Gợi ý: Nhịp ${meters.join(", ")}` : "Tự chọn"
       });
