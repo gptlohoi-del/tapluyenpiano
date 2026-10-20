@@ -68,5 +68,19 @@
     "notes": [1, 5, 3, 5, 8, 5],
     "suggestedMeters": ["3/4", "6/8"],
     "hint": "Gợi ý: Nhịp 3/4, 6/8 (Rải đều, trầm ấm)"
+  },
+  {
+    "id": "p11",
+    "name": "Mẫu 11: 1 – (3 5) – 1 – (3 5)",
+    "notes": [1, [3, 5], 1, [3, 5]],
+    "suggestedMeters": ["2/4", "4/4"],
+    "hint": "Gợi ý: Nhịp 2/4, 4/4 (Đệm chập hành khúc / Polka)"
+  },
+  {
+    "id": "p12",
+    "name": "Mẫu 12: 1 – (3 5) – (3 5)",
+    "notes": [1, [3, 5], [3, 5]],
+    "suggestedMeters": ["3/4"],
+    "hint": "Gợi ý: Nhịp 3/4 (Đệm chập Valse Bùm - Chách - Chách)"
   }
 ]
