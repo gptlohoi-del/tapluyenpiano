@@ -1802,7 +1802,7 @@
       const topLineY = showLyricOnSheet ? 16 : 22;
       const bottomLineY = topLineY + 4 * lineSpacing;
       const playheadX = width * 0.42;
-      const pxPerQuarter = 62;
+      const pxPerQuarter = 96; // Tăng khoảng cách ngang để nốt móc kép không đè chữ
 
       ctx.strokeStyle = "#5D4037";
       ctx.lineWidth = 1;
@@ -1819,8 +1819,13 @@
         return;
       }
 
+      // Kiểm tra xem ô đầu tiên có phải là ô nhịp lấy đà (ngắn hơn số phách chuẩn) hay không
+      const firstM = songData.measuresInfo[0];
+      const hasPickup = firstM && firstM.durationQuarter < (songData.beats * 4) / songData.beatType - 0.1;
+
       songData.measuresInfo.forEach((m) => {
-        const barX = playheadX + (m.startQuarter - currentBeat) * pxPerQuarter;
+        // Dịch vạch nhịp sang trái 14px để nằm trước nốt đầu tiên của ô nhịp
+        const barX = playheadX + (m.startQuarter - currentBeat) * pxPerQuarter - 14;
         if (barX >= 48 && barX <= width + 20) {
           ctx.strokeStyle = "#4E342E";
           ctx.lineWidth = 1.4;
@@ -1829,10 +1834,13 @@
           ctx.lineTo(barX, bottomLineY);
           ctx.stroke();
 
-          ctx.fillStyle = "#8D6E63";
-          ctx.font = "600 10px Lexend";
-          ctx.textAlign = "left";
-          ctx.fillText(`${m.index + 1}`, barX + 3, topLineY - 4);
+          const displayMeasureNum = hasPickup ? m.index : m.index + 1;
+          if (displayMeasureNum > 0) {
+            ctx.fillStyle = "#8D6E63";
+            ctx.font = "600 10px Lexend";
+            ctx.textAlign = "left";
+            ctx.fillText(`${displayMeasureNum}`, barX + 3, topLineY - 4);
+          }
         }
       });
 
@@ -2089,6 +2097,14 @@
         ctx.moveTo(firstStemX - 0.5, beamStartY);
         ctx.lineTo(lastStemX + 0.5, beamEndY);
         ctx.stroke();
+
+        // Nếu trong chùm có nốt móc kép (<= 0.3 phách), vẽ thêm gạch dầm thứ 2
+        if (cluster.some((g) => g.durationQuarter <= 0.3)) {
+          ctx.beginPath();
+          ctx.moveTo(firstStemX - 0.5, beamStartY - 6);
+          ctx.lineTo(lastStemX + 0.5, beamEndY - 6);
+          ctx.stroke();
+        }
       });
 
       ctx.strokeStyle = "rgba(198, 40, 40, 0.85)";
@@ -2239,7 +2255,10 @@
             ctx.fillStyle = "rgba(109, 76, 65, 0.65)";
             ctx.font = "600 12px Lexend";
             ctx.textAlign = "left";
-            ctx.fillText(`Ô ${m.index + 1}`, 6, dy - 3);
+            const firstM = songData.measuresInfo[0];
+            const hasPickup = firstM && firstM.durationQuarter < (songData.beats * 4) / songData.beatType - 0.1;
+            const mNum = hasPickup ? m.index : m.index + 1;
+            ctx.fillText(mNum === 0 ? "Nhịp lấy đà" : `Ô ${mNum}`, 6, dy - 3);
           }
         });
       }
