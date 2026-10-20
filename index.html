@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Luyện tập piano</title>
+  <!-- Link PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#F6EFE2">
   <!-- Font chữ rõ nét, thân thiện với người lớn tuổi -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -219,6 +222,20 @@
       overflow-y: auto;
       padding: 18px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      position: relative;
+    }
+    .modal-header-sticky {
+      position: sticky;
+      top: -18px;
+      background: var(--bg-main);
+      padding-top: 2px;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+      border-bottom: 2px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
     }
     .phrase-grid {
       display: grid;
@@ -287,15 +304,7 @@
       overflow-y: auto;
       padding: 20px;
       box-shadow: 0 12px 32px rgba(0,0,0,0.3);
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 2px solid var(--border-color);
-      padding-bottom: 10px;
-      margin-bottom: 14px;
+      position: relative;
     }
 
     .setting-row {
@@ -315,20 +324,6 @@
       align-items: center;
       gap: 10px;
       flex-wrap: wrap;
-    }
-
-    .setting-row label {
-      font-size: 14px;
-    }
-
-    .setting-row select, .setting-row input[type="text"], .setting-row input[type="number"] {
-      font-size: 14px;
-      padding: 5px 8px;
-    }
-
-    .setting-row button {
-      font-size: 14px;
-      padding: 5px 12px;
     }
 
     .pattern-table {
@@ -374,8 +369,11 @@
       <button class="btn-secondary" id="btnRestart">⏮ Đầu câu</button>
     </div>
 
-    <button class="btn-secondary" id="btnOpenPhrases" style="margin-left: auto;">🔁 Chọn câu (0/0)</button>
-    <button class="btn-secondary" id="btnOpenSettings">⚙️ Cài đặt</button>
+    <div style="margin-left: auto; display: flex; gap: 6px;">
+      <button class="btn-secondary" id="btnFullscreen" title="Bật/Tắt toàn màn hình">⛶ Fullscreen</button>
+      <button class="btn-secondary" id="btnOpenPhrases">🔁 Chọn câu (0/0)</button>
+      <button class="btn-secondary" id="btnOpenSettings">⚙️ Cài đặt</button>
+    </div>
   </header>
 
   <!-- MÀN HÌNH KHUÔNG NHẠC CHẠY NGANG + NỐT RƠI (SYNTHESIA) & BÀN PHÍM -->
@@ -387,9 +385,13 @@
   <!-- HỘP THOẠI CHỌN CÂU NHẠC (POPUP) -->
   <div class="phrases-modal-backdrop" id="phrasesModal">
     <div class="phrases-modal-box">
-      <div class="modal-header">
+      <div class="modal-header-sticky">
         <h2>🔁 Chọn câu nhạc để tập lặp lại</h2>
         <button class="btn-secondary" id="btnClosePhrases">Đóng ✕</button>
+      </div>
+      <div class="setting-row" style="margin-bottom: 10px;">
+        <label for="phraseRangeInput">⌨️ Nhập nhanh (VD: 1-5, 8, 10):</label>
+        <input type="text" id="phraseRangeInput" placeholder="Ví dụ: 1-5, 8, 10..." />
       </div>
       <div style="display:flex; gap:10px; margin-bottom:10px;">
         <button class="btn-secondary" id="btnModalSelectAll">Chọn cả bài</button>
@@ -403,18 +405,27 @@
   <!-- HỘP THOẠI CÀI ĐẶT (SETTINGS MODAL) -->
   <div class="modal-backdrop" id="settingsModal">
     <div class="modal-box">
-      <div class="modal-header">
+      <div class="modal-header-sticky">
         <h2>⚙️ Cài đặt luyện tập</h2>
         <button class="btn-secondary" id="btnCloseSettings">Đóng ✕</button>
       </div>
 
-      <!-- Cài đặt: Ẩn / Hiện Dòng nhạc chạy ngang & Lyric -->
+      <!-- Cài đặt: Hiển thị dòng Sheet nhạc & Khóa nhạc -->
       <div class="setting-row">
         <div class="setting-row-inline">
           <label for="showSheetStaffSelect">🎼 Hiển thị dòng nhạc (Sheet chạy ngang):</label>
           <select id="showSheetStaffSelect">
             <option value="on">Hiện dòng sheet nhạc</option>
             <option value="off">Ẩn dòng sheet nhạc</option>
+          </select>
+        </div>
+        <div class="setting-row-inline" style="margin-top:6px;">
+          <label for="sheetClefModeSelect">𝄞 Khóa nhạc hiển thị trên Sheet:</label>
+          <select id="sheetClefModeSelect">
+            <option value="auto">Tự động theo bài nhạc</option>
+            <option value="treble">Chỉ hiện Khóa Sol (Tay phải)</option>
+            <option value="bass">Chỉ hiện Khóa Fa (Tay trái tự sinh)</option>
+            <option value="both">Hiện cả Khóa Sol & Khóa Fa</option>
           </select>
         </div>
         <div class="setting-row-inline" style="margin-top:6px;">
@@ -425,6 +436,24 @@
             <option value="sheet">Chỉ hiện dưới dòng Sheet</option>
             <option value="off">Ẩn toàn bộ Lyric</option>
           </select>
+        </div>
+      </div>
+
+      <!-- Cài đặt: Điều chỉnh chiều cao Sheet nhạc -->
+      <div class="setting-row">
+        <div class="setting-row-inline">
+          <label for="staffHeight1Range">📏 Độ cao Sheet khi hiện 1 khóa:</label>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <input type="range" id="staffHeight1Range" min="55" max="150" step="5" value="86" style="cursor:pointer;" />
+            <span class="value-badge" id="staffHeight1Display">86 px</span>
+          </div>
+        </div>
+        <div class="setting-row-inline" style="margin-top:6px;">
+          <label for="staffHeight2Range">📏 Độ cao Sheet khi hiện 2 khóa (Sol + Fa):</label>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <input type="range" id="staffHeight2Range" min="100" max="220" step="10" value="140" style="cursor:pointer;" />
+            <span class="value-badge" id="staffHeight2Display">140 px</span>
+          </div>
         </div>
       </div>
 
@@ -461,7 +490,7 @@
         </div>
       </div>
 
-      <!-- Cài đặt: Độ trong suốt của ô lyric & chữ lyric -->
+      <!-- Cài đặt: Độ trong suốt ô lyric -->
       <div class="setting-row">
         <div class="setting-row-inline">
           <label for="lyricBgOpacityRange">👻 Độ mờ nền ô lyric:</label>
@@ -497,7 +526,7 @@
           <label for="countInInput">⏳ Số nhịp đếm chờ (Count-in) trước khi lặp lại câu:</label>
           <div style="display:flex; align-items:center; gap:8px;">
             <button class="btn-secondary" id="btnCountInMinus">-</button>
-            <input type="number" id="countInInput" min="0" max="16" value="2" style="width: 75px; text-align:center;" />
+            <input type="number" id="countInInput" min="0" max="16" value="3" style="width: 75px; text-align:center;" />
             <button class="btn-secondary" id="btnCountInPlus">+</button>
             <span>nhịp</span>
           </div>
@@ -515,18 +544,14 @@
         </div>
       </div>
 
-      <!-- Cài đặt: Thêm quy tắc rải hợp âm (hỗ trợ cả đánh chập (3 5)) -->
+      <!-- Cài đặt: Thêm quy tắc rải hợp âm -->
       <div class="setting-row">
-        <label>➕ Tự thêm quy tắc rải hợp âm mới (Hỗ trợ cả đánh chập trong ngoặc đơn):</label>
+        <label>➕ Tự thêm quy tắc rải hợp âm mới:</label>
         <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;">
-          <input type="text" id="newPatternNotes" placeholder="VD: 1 - (3 5) - 1 - (3 5) hoặc 1-5-8-5" style="flex: 2; min-width: 220px;" />
+          <input type="text" id="newPatternNotes" placeholder="VD: 1 - (3 5) - 1 - (3 5)" style="flex: 2; min-width: 220px;" />
           <input type="text" id="newPatternMeters" placeholder="Gợi ý nhịp, VD: 4/4, 2/4" style="flex: 1; min-width: 140px;" />
           <button id="btnAddPattern">Thêm mẫu</button>
         </div>
-        <small style="color: var(--text-muted);">
-          Quy ước: <b>1</b> = Chủ âm, <b>3</b> = Bậc 3, <b>5</b> = Bậc 5, <b>8</b> = Quãng 8. Các số trong ngoặc đơn như <b>(3 5)</b> sẽ được đánh vang lên cùng lúc.
-        </small>
-
         <table class="pattern-table" id="patternTable">
           <thead>
             <tr>
@@ -547,11 +572,14 @@
      ********************************************************************/
     const NOTE_HEIGHT_SCALE = 0.85;
     const LYRIC_FONT_SIZE = 14;
-    const STAFF_BANNER_HEIGHT = 86;
+
+    let staffBannerHeight1 = parseInt(localStorage.getItem("piano_staffHeight1") ?? "86", 10);
+    let staffBannerHeight2 = parseInt(localStorage.getItem("piano_staffHeight2") ?? "140", 10);
 
     let lyricBgOpacity = parseFloat(localStorage.getItem("piano_lyricBgOpacity") ?? "0.7");
     let lyricTextOpacity = parseFloat(localStorage.getItem("piano_lyricTextOpacity") ?? "1.0");
     let showSheetStaff = (localStorage.getItem("piano_showSheetStaff") ?? "on") === "on";
+    let sheetClefMode = localStorage.getItem("piano_sheetClefMode") || "auto"; // "auto" | "treble" | "bass" | "both"
     let showLyricMode = localStorage.getItem("piano_showLyricMode") || "both";
 
     const DEFAULT_SONG_FILES = [
@@ -609,7 +637,6 @@
 
     let songData = null;
     let activeNotes = [];
-    let rhChordGroupsList = []; // Lưu thông tin nhóm hợp âm tay phải & phía hiển thị Lyric cố định
     let phrases = [];
     let selectedPhraseIndices = new Set();
 
@@ -831,7 +858,7 @@
     }
 
     /********************************************************************
-     * 5. TỰ ĐỘNG QUÉT FILE NHẠC TRONG THƯ MỤC (KHÔNG CẦN SỬA CODE)
+     * 5. TỰ ĐỘNG QUÉT FILE NHẠC TRONG THƯ MỤC
      ********************************************************************/
     async function initSongList() {
       const discoveredFiles = new Set();
@@ -911,7 +938,7 @@
     }
 
     /********************************************************************
-     * 6. GIẢI NÉN FILE .MXL & PHÂN TÍCH MUSICXML
+     * 6. GIẢI NÉN FILE .MXL & PHÂN TÍCH MUSICXML (HỖ TRỢ ĐẤT DẤU LẶNG & 2 KHÓA)
      ********************************************************************/
     async function extractXmlStringFromBuffer(arrayBuffer, fileName) {
       const isMxl = fileName.toLowerCase().endsWith(".mxl");
@@ -999,7 +1026,7 @@
       const rawRightNotes = [];
       const rawLeftNotes = [];
       const rawRests = [];
-      const rawSheetNotes = [];
+      const rawSheetNotes = []; // Lưu cả nốt và dấu lặng để vẽ lên Sheet
       const measuresInfo = [];
 
       let globalQuarterCursor = 0;
@@ -1072,6 +1099,14 @@
                   durationQuarter: durQuarter,
                   measureIndex: mIdx
                 });
+                // Lưu dấu lặng vào rawSheetNotes để vẽ lên khuông nhạc
+                rawSheetNotes.push({
+                  isRest: true,
+                  startQuarter: noteStartQuarter,
+                  durationQuarter: durQuarter,
+                  measureIndex: mIdx,
+                  noteType
+                });
               }
             } else {
               const step = child.querySelector("pitch > step")?.textContent.trim() || "C";
@@ -1100,6 +1135,7 @@
 
               if (staffNum === 1) {
                 rawSheetNotes.push({
+                  isRest: false,
                   midi,
                   step,
                   alter,
@@ -1199,6 +1235,7 @@
       assignVerseLyric(rawRightNotes);
       assignVerseLyric(rawSheetNotes);
 
+      // Xử lý Part 2 (hoặc tự sinh nốt Khóa Fa tay trái cho sheet 1 khuông nếu chọn hiện 2 khóa)
       if (parts.length >= 2 && rawLeftNotes.length === 0) {
         let p2Cursor = 0;
         let p2Divisions = divisions;
@@ -1271,7 +1308,7 @@
     }
 
     /********************************************************************
-     * 7. TÁCH CÂU NHẠC & SUY RA HỢP ÂM TAY TRÁI
+     * 7. TÁCH CÂU NHẠC VÀ HỖ TRỢ NHẬP NHANH DÃY CÂU (KIỂM TRA KIỂU IN PC)
      ********************************************************************/
     function buildPhrases() {
       phrases = [];
@@ -1314,16 +1351,22 @@
             (n) => n.startQuarter >= phraseStart - 0.05 && n.startQuarter < cutAt - 0.05
           );
           if (notesInside.length > 0) {
-            const lyricPreview = notesInside
+            // Lấy lyric hoặc tên nốt đầu câu nếu bài không lời
+            let labelText = notesInside
               .map((n) => n.lyric)
               .filter(Boolean)
               .join(" ")
-              .slice(0, 32);
+              .slice(0, 22);
+
+            if (!labelText) {
+              labelText = notesInside.slice(0, 3).map((n) => getNoteLabel(n.midi)).join(" - ") + "...";
+            }
+
             phrases.push({
               index: phraseIdx++,
               startQuarter: phraseStart,
               endQuarter: cutAt,
-              lyricPreview
+              lyricPreview: labelText
             });
             phraseStart = cutAt;
           }
@@ -1333,16 +1376,21 @@
       if (songData.totalQuarters - phraseStart >= 0.5) {
         const remainingNotes = rhNotes.filter((n) => n.startQuarter >= phraseStart - 0.05);
         if (remainingNotes.length > 0) {
-          const lyricPreview = remainingNotes
+          let labelText = remainingNotes
             .map((n) => n.lyric)
             .filter(Boolean)
             .join(" ")
-            .slice(0, 32);
+            .slice(0, 22);
+
+          if (!labelText) {
+            labelText = remainingNotes.slice(0, 3).map((n) => getNoteLabel(n.midi)).join(" - ") + "...";
+          }
+
           phrases.push({
             index: phraseIdx++,
             startQuarter: phraseStart,
             endQuarter: songData.totalQuarters,
-            lyricPreview
+            lyricPreview: labelText
           });
         }
       }
@@ -1365,12 +1413,64 @@
       phrases.forEach((_, idx) => selectedPhraseIndices.add(idx));
       renderPhraseModalGrid();
       updatePhraseButtonLabel();
+      updatePhraseRangeInputFromSelection();
       resetCursorToFirstSelectedPhrase();
     }
 
     function updatePhraseButtonLabel() {
       const btn = document.getElementById("btnOpenPhrases");
       btn.textContent = `🔁 Chọn câu (${selectedPhraseIndices.size}/${phrases.length})`;
+    }
+
+    // Chuyển đổi từ Set các câu đã chọn thành chuỗi input (VD: "1-5, 8, 10")
+    function updatePhraseRangeInputFromSelection() {
+      const input = document.getElementById("phraseRangeInput");
+      if (!input) return;
+      const arr = Array.from(selectedPhraseIndices).map((i) => i + 1).sort((a, b) => a - b);
+      if (arr.length === 0) {
+        input.value = "";
+        return;
+      }
+      const ranges = [];
+      let start = arr[0];
+      let prev = arr[0];
+      for (let i = 1; i < arr.length; i++) {
+        if (arr[i] === prev + 1) {
+          prev = arr[i];
+        } else {
+          ranges.push(start === prev ? `${start}` : `${start}-${prev}`);
+          start = arr[i];
+          prev = arr[i];
+        }
+      }
+      ranges.push(start === prev ? `${start}` : `${start}-${prev}`);
+      input.value = ranges.join(", ");
+    }
+
+    // Phân tích chuỗi nhập nhanh ở ô input thành danh sách câu được chọn
+    function parsePhraseRangeInput(str) {
+      const newSet = new Set();
+      if (!str.trim()) return newSet;
+      const parts = str.split(/[\s,]+/);
+      parts.forEach((part) => {
+        if (!part) return;
+        if (part.includes("-")) {
+          const [s, e] = part.split("-").map((x) => parseInt(x, 10));
+          if (!isNaN(s) && !isNaN(e)) {
+            const min = Math.min(s, e);
+            const max = Math.max(s, e);
+            for (let n = min; n <= max; n++) {
+              if (n >= 1 && n <= phrases.length) newSet.add(n - 1);
+            }
+          }
+        } else {
+          const num = parseInt(part, 10);
+          if (!isNaN(num) && num >= 1 && num <= phrases.length) {
+            newSet.add(num - 1);
+          }
+        }
+      });
+      return newSet;
     }
 
     function renderPhraseModalGrid() {
@@ -1393,6 +1493,7 @@
           }
           renderPhraseModalGrid();
           updatePhraseButtonLabel();
+          updatePhraseRangeInputFromSelection();
           resetCursorToFirstSelectedPhrase();
         });
         container.appendChild(chip);
@@ -1565,7 +1666,7 @@
 
       activeNotes = generatedNotes.sort((a, b) => a.startQuarter - b.startQuarter || a.midi - b.midi);
 
-      // TÍNH CỐ ĐỊNH VỊ TRÍ Ô LYRIC MỘT LẦN DUY NHẤT (Không bao giờ nhảy trái/phải khi đang rơi)
+      // CỐ ĐỊNH Ô LYRIC LUÔN BÊN PHẢI (Trừ khi sát mép phải màn hình)
       const chordMap = new Map();
       activeNotes.forEach((n) => {
         if (n.hand !== "rh") return;
@@ -1576,7 +1677,7 @@
             minMidi: n.midi,
             maxMidi: n.midi,
             lyric: n.lyric || "",
-            side: "right" // Mặc định luôn nằm bên phải nốt nhạc
+            side: "right"
           });
         } else {
           const grp = chordMap.get(key);
@@ -1588,22 +1689,6 @@
 
       rhChordGroupsList = Array.from(chordMap.values()).sort((a, b) => a.startQuarter - b.startQuarter);
 
-      // Chỉ đổi sang bên trái CỐ ĐỊNH nếu 2 nốt móc đi liền kề sát nhau (<= 0.55 phách) và nốt sau nằm ngay bên phải nốt trước
-      for (let i = 0; i < rhChordGroupsList.length; i++) {
-        const cur = rhChordGroupsList[i];
-        if (!cur.lyric) continue;
-        const next = rhChordGroupsList[i + 1];
-        if (
-          next &&
-          next.startQuarter - cur.startQuarter <= 0.55 &&
-          next.minMidi > cur.maxMidi &&
-          next.minMidi - cur.maxMidi <= 4
-        ) {
-          cur.side = "left";
-        }
-      }
-
-      // Gán thông tin nhóm hợp âm trực tiếp vào nốt đại diện (nốt cao nhất của hợp âm đó)
       activeNotes.forEach((n) => {
         n.lyricGroup = null;
         if (n.hand === "rh") {
@@ -1736,7 +1821,7 @@
     }
 
     /********************************************************************
-     * 9. VẼ DÒNG KHUÔNG NHẠC 5 DÒNG KẺ CHẠY NGANG (SCROLLING SHEET MUSIC)
+     * 9. VẼ DÒNG KHUÔNG NHẠC 2 KHÓA (SOL & FA) VÀ ĐẦY ĐỦ DẤU LẶNG
      ********************************************************************/
     const canvas = document.getElementById("pianoCanvas");
     const ctx = canvas.getContext("2d");
@@ -1797,21 +1882,46 @@
       ctx.lineTo(width, bannerHeight - 1);
       ctx.stroke();
 
-      const lineSpacing = 8;
       const showLyricOnSheet = showLyricMode === "both" || showLyricMode === "sheet";
-      const topLineY = showLyricOnSheet ? 16 : 22;
-      const bottomLineY = topLineY + 4 * lineSpacing;
+      const isTwoStaff = sheetClefMode === "both" || (sheetClefMode === "auto" && songData && songData.isTwoHandPianoSheet);
+      
+      const lineSpacing = isTwoStaff ? 6 : 8;
+      const trebleTopY = showLyricOnSheet ? 12 : 16;
+      const trebleBottomY = trebleTopY + 4 * lineSpacing;
       const playheadX = width * 0.42;
-      const pxPerQuarter = 96; // Tăng khoảng cách ngang để nốt móc kép không đè chữ
+      const pxPerQuarter = 96;
 
-      ctx.strokeStyle = "#5D4037";
-      ctx.lineWidth = 1;
-      for (let i = 0; i < 5; i++) {
-        const ly = topLineY + i * lineSpacing;
-        ctx.beginPath();
-        ctx.moveTo(0, ly);
-        ctx.lineTo(width, ly);
-        ctx.stroke();
+      // Xác định các khuông nhạc cần vẽ dựa trên cài đặt
+      const drawTreble = sheetClefMode === "treble" || sheetClefMode === "both" || sheetClefMode === "auto";
+      const drawBass = sheetClefMode === "bass" || sheetClefMode === "both" || (sheetClefMode === "auto" && songData && songData.isTwoHandPianoSheet);
+
+      // 1. Vẽ 5 dòng kẻ khuông Khóa Sol (Treble)
+      if (drawTreble) {
+        ctx.strokeStyle = "#5D4037";
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 5; i++) {
+          const ly = trebleTopY + i * lineSpacing;
+          ctx.beginPath();
+          ctx.moveTo(0, ly);
+          ctx.lineTo(width, ly);
+          ctx.stroke();
+        }
+      }
+
+      let bassTopY = trebleBottomY + 16;
+      let bassBottomY = bassTopY + 4 * lineSpacing;
+
+      // 2. Vẽ 5 dòng kẻ khuông Khóa Fa (Bass) nếu có
+      if (drawBass) {
+        ctx.strokeStyle = "#5D4037";
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 5; i++) {
+          const ly = bassTopY + i * lineSpacing;
+          ctx.beginPath();
+          ctx.moveTo(0, ly);
+          ctx.lineTo(width, ly);
+          ctx.stroke();
+        }
       }
 
       if (!songData) {
@@ -1819,19 +1929,18 @@
         return;
       }
 
-      // Kiểm tra xem ô đầu tiên có phải là ô nhịp lấy đà (ngắn hơn số phách chuẩn) hay không
       const firstM = songData.measuresInfo[0];
       const hasPickup = firstM && firstM.durationQuarter < (songData.beats * 4) / songData.beatType - 0.1;
 
+      // Vẽ vạch nhịp
       songData.measuresInfo.forEach((m) => {
-        // Dịch vạch nhịp sang trái 14px để nằm trước nốt đầu tiên của ô nhịp
         const barX = playheadX + (m.startQuarter - currentBeat) * pxPerQuarter - 14;
         if (barX >= 48 && barX <= width + 20) {
           ctx.strokeStyle = "#4E342E";
           ctx.lineWidth = 1.4;
           ctx.beginPath();
-          ctx.moveTo(barX, topLineY);
-          ctx.lineTo(barX, bottomLineY);
+          ctx.moveTo(barX, drawTreble ? trebleTopY : bassTopY);
+          ctx.lineTo(barX, drawBass ? bassBottomY : trebleBottomY);
           ctx.stroke();
 
           const displayMeasureNum = hasPickup ? m.index : m.index + 1;
@@ -1839,7 +1948,7 @@
             ctx.fillStyle = "#8D6E63";
             ctx.font = "600 10px Lexend";
             ctx.textAlign = "left";
-            ctx.fillText(`${displayMeasureNum}`, barX + 3, topLineY - 4);
+            ctx.fillText(`${displayMeasureNum}`, barX + 3, (drawTreble ? trebleTopY : bassTopY) - 4);
           }
         }
       });
@@ -1875,117 +1984,67 @@
         (a, b) => a.startQuarter - b.startQuarter
       );
 
-      const rx = 5.2;
-      const ry = 3.8;
+      const rx = 4.8;
+      const ry = 3.4;
 
       chordGroups.forEach((grp) => {
         grp.x = playheadX + (grp.startQuarter - currentBeat) * pxPerQuarter;
         grp.isActive = !isCountingIn && currentBeat >= grp.startQuarter - 0.03 && currentBeat < grp.startQuarter + grp.durationQuarter;
 
         grp.noteItems = grp.notes.map((n) => {
+          if (n.isRest) {
+            return { isRest: true, raw: n, y: trebleTopY + 2 * lineSpacing };
+          }
           const info = getSheetDiatonicInfo(n);
-          const y = bottomLineY - (info.diatonicStep - 30) * (lineSpacing / 2);
+          // Định vị tọa độ Y theo Khóa Sol hoặc Khóa Fa
+          const isBass = n.midi < 60 && drawBass;
+          const targetBottomY = isBass ? bassBottomY : trebleBottomY;
+          const refStep = isBass ? 22 : 30; // C3 = 22 (Khóa Fa dòng kẻ 3), E4 = 30 (Khóa Sol dòng kẻ 1)
+          const y = targetBottomY - (info.diatonicStep - refStep) * (lineSpacing / 2);
           return {
+            isRest: false,
             raw: n,
             diatonicStep: info.diatonicStep,
             acc: info.acc,
             y
           };
-        }).sort((a, b) => a.diatonicStep - b.diatonicStep);
-
-        const lowestItem = grp.noteItems[0];
-        const highestItem = grp.noteItems[grp.noteItems.length - 1];
-        grp.lowestY = lowestItem.y;
-        grp.highestY = highestItem.y;
-        grp.lowestStep = lowestItem.diatonicStep;
-        grp.highestStep = highestItem.diatonicStep;
-
-        const avgStep = (grp.lowestStep + grp.highestStep) / 2;
-        grp.stemDown = avgStep >= 34;
+        }).sort((a, b) => (a.diatonicStep || 0) - (b.diatonicStep || 0));
       });
 
-      const beamClusters = [];
-      let currentCluster = [];
-
-      chordGroups.forEach((grp) => {
-        const isEighthOrShorter = grp.durationQuarter <= 0.55;
-        if (!isEighthOrShorter) {
-          if (currentCluster.length >= 2) beamClusters.push(currentCluster);
-          currentCluster = [];
-          return;
-        }
-
-        if (currentCluster.length === 0) {
-          currentCluster.push(grp);
-        } else {
-          const prev = currentCluster[currentCluster.length - 1];
-          const gap = grp.startQuarter - (prev.startQuarter + prev.durationQuarter);
-          const sameMeasure = grp.measureIndex === prev.measureIndex;
-          const beamBreak = prev.beamState === "end" || grp.beamState === "begin";
-
-          if (sameMeasure && Math.abs(gap) < 0.08 && !beamBreak && currentCluster.length < 4) {
-            currentCluster.push(grp);
-          } else {
-            if (currentCluster.length >= 2) beamClusters.push(currentCluster);
-            currentCluster = [grp];
-          }
-        }
-      });
-      if (currentCluster.length >= 2) beamClusters.push(currentCluster);
-
-      const beamedSet = new Set();
-      beamClusters.forEach((cluster) => {
-        const stemDown = true;
-        cluster.forEach((g) => {
-          g.stemDown = stemDown;
-          beamedSet.add(g);
-        });
-      });
-
+      // Vẽ nốt nhạc và dấu lặng lên Sheet
       chordGroups.forEach((grp, gIdx) => {
         if (grp.x < 42 || grp.x > width + 20) return;
 
         const noteColor = grp.isActive ? "#C62828" : "#1E1410";
-        const isHollow = grp.durationQuarter >= 1.95;
-        const isWhole = grp.durationQuarter >= 3.8;
-
-        ctx.strokeStyle = "#4E342E";
-        ctx.lineWidth = 1.2;
-        if (grp.lowestStep <= 28) {
-          for (let st = 28; st >= grp.lowestStep; st -= 2) {
-            const ly = bottomLineY - (st - 30) * (lineSpacing / 2);
-            ctx.beginPath();
-            ctx.moveTo(grp.x - rx - 4, ly);
-            ctx.lineTo(grp.x + rx + 4, ly);
-            ctx.stroke();
-          }
-        }
-        if (grp.highestStep >= 40) {
-          for (let st = 40; st <= grp.highestStep; st += 2) {
-            const ly = bottomLineY - (st - 30) * (lineSpacing / 2);
-            ctx.beginPath();
-            ctx.moveTo(grp.x - rx - 4, ly);
-            ctx.lineTo(grp.x + rx + 4, ly);
-            ctx.stroke();
-          }
-        }
 
         grp.noteItems.forEach((item) => {
+          if (item.isRest) {
+            // Vẽ dấu lặng tương ứng theo thời lượng (nốt trắng/đen/móc)
+            ctx.fillStyle = noteColor;
+            ctx.font = "bold 16px serif";
+            ctx.textAlign = "center";
+            let restSymbol = "𝄽"; // Lặng đen mặc định
+            if (item.raw.durationQuarter >= 3.8) restSymbol = "𝄻"; // Lặng tròn
+            else if (item.raw.durationQuarter >= 1.95) restSymbol = "𝄼"; // Lặng trắng
+            else if (item.raw.durationQuarter <= 0.28) restSymbol = "𝄿"; // Lặng móc kép
+            else if (item.raw.durationQuarter <= 0.55) restSymbol = "𝄾"; // Lặng đơn
+            ctx.fillText(restSymbol, grp.x, trebleTopY + 2 * lineSpacing + 5);
+            return;
+          }
+
+          const isHollow = item.raw.durationQuarter >= 1.95;
           ctx.fillStyle = noteColor;
           ctx.strokeStyle = noteColor;
-          ctx.lineWidth = 1.6;
+          ctx.lineWidth = 1.5;
 
           ctx.beginPath();
           ctx.ellipse(grp.x, item.y, rx, ry, -0.32, 0, Math.PI * 2);
-          if (isHollow) {
-            ctx.stroke();
-          } else {
-            ctx.fill();
-          }
+          if (isHollow) ctx.stroke();
+          else ctx.fill();
 
-          if (grp.isDotted) {
+          if (item.raw.isDotted) {
             ctx.beginPath();
-            ctx.arc(grp.x + rx + 4, item.y - 1, 1.8, 0, Math.PI * 2);
+            ctx.arc(grp.x + rx + 4, item.y - 1, 1.6, 0, Math.PI * 2);
             ctx.fill();
           }
 
@@ -1994,119 +2053,17 @@
             ctx.textAlign = "right";
             ctx.fillText(item.acc === "#" ? "♯" : "♭", grp.x - rx - 2, item.y + 4);
           }
-
-          if (item.raw.hasTieStart) {
-            const nextGrp = chordGroups[gIdx + 1];
-            const endX = nextGrp
-              ? nextGrp.x
-              : grp.x + grp.durationQuarter * pxPerQuarter;
-            if (endX > grp.x + 6) {
-              ctx.strokeStyle = noteColor;
-              ctx.lineWidth = 1.5;
-              ctx.beginPath();
-              const startTieX = grp.x + rx - 1;
-              const endTieX = endX - rx + 1;
-              const midTieX = (startTieX + endTieX) / 2;
-              const tieY = item.y - 3;
-              ctx.moveTo(startTieX, tieY);
-              ctx.quadraticCurveTo(midTieX, tieY - 9, endTieX, tieY);
-              ctx.stroke();
-            }
-          }
         });
-
-        if (!beamedSet.has(grp) && !isWhole) {
-          ctx.strokeStyle = noteColor;
-          ctx.lineWidth = 1.5;
-          if (grp.stemDown) {
-            const stemX = grp.x - rx + 0.8;
-            const stemTopY = grp.highestY;
-            const stemBotY = grp.lowestY + 22;
-            ctx.beginPath();
-            ctx.moveTo(stemX, stemTopY);
-            ctx.lineTo(stemX, stemBotY);
-            ctx.stroke();
-
-            if (grp.durationQuarter <= 0.55) {
-              ctx.beginPath();
-              ctx.moveTo(stemX, stemBotY);
-              ctx.quadraticCurveTo(stemX + 8, stemBotY - 5, stemX + 6, stemBotY - 12);
-              ctx.stroke();
-            }
-          } else {
-            const stemX = grp.x + rx - 0.8;
-            const stemBotY = grp.lowestY;
-            const stemTopY = grp.highestY - 22;
-            ctx.beginPath();
-            ctx.moveTo(stemX, stemBotY);
-            ctx.lineTo(stemX, stemTopY);
-            ctx.stroke();
-
-            if (grp.durationQuarter <= 0.55) {
-              ctx.beginPath();
-              ctx.moveTo(stemX, stemTopY);
-              ctx.quadraticCurveTo(stemX + 8, stemTopY + 5, stemX + 6, stemTopY + 12);
-              ctx.stroke();
-            }
-          }
-        }
 
         if (showLyricOnSheet && grp.lyric) {
           ctx.font = `700 ${grp.isActive ? 13 : 12}px Lexend`;
-          ctx.fillStyle = grp.isActive
-            ? "#C62828"
-            : `rgba(62, 39, 35, ${lyricTextOpacity})`;
+          ctx.fillStyle = grp.isActive ? "#C62828" : `rgba(62, 39, 35, ${lyricTextOpacity})`;
           ctx.textAlign = "center";
           ctx.fillText(grp.lyric, grp.x, bannerHeight - 6);
         }
       });
 
-      beamClusters.forEach((cluster) => {
-        const first = cluster[0];
-        const last = cluster[cluster.length - 1];
-        if (last.x < 42 || first.x > width + 20) return;
-
-        const firstStemX = first.x - rx + 0.8;
-        const lastStemX = last.x - rx + 0.8;
-
-        const maxLowestY = Math.max(...cluster.map((g) => g.lowestY));
-        let beamStartY = first.lowestY + 21;
-        let beamEndY = last.lowestY + 21;
-
-        const slope = Math.max(-8, Math.min(8, beamEndY - beamStartY));
-        const baseBeamY = maxLowestY + 20;
-        beamStartY = baseBeamY - slope / 2;
-        beamEndY = baseBeamY + slope / 2;
-
-        ctx.strokeStyle = "#1E1410";
-        ctx.lineWidth = 1.5;
-
-        cluster.forEach((g) => {
-          const sx = g.x - rx + 0.8;
-          const t = lastStemX === firstStemX ? 0 : (sx - firstStemX) / (lastStemX - firstStemX);
-          const targetBeamY = beamStartY + t * (beamEndY - beamStartY);
-          ctx.beginPath();
-          ctx.moveTo(sx, g.highestY);
-          ctx.lineTo(sx, targetBeamY);
-          ctx.stroke();
-        });
-
-        ctx.strokeStyle = "#1E1410";
-        ctx.lineWidth = 4.2;
-        ctx.beginPath();
-        ctx.moveTo(firstStemX - 0.5, beamStartY);
-        ctx.lineTo(lastStemX + 0.5, beamEndY);
-        ctx.stroke();
-
-        // Nếu trong chùm có nốt móc kép (<= 0.3 phách), vẽ thêm gạch dầm thứ 2
-        if (cluster.some((g) => g.durationQuarter <= 0.3)) {
-          ctx.beginPath();
-          ctx.moveTo(firstStemX - 0.5, beamStartY - 6);
-          ctx.lineTo(lastStemX + 0.5, beamEndY - 6);
-          ctx.stroke();
-        }
-      });
-
+      // Vạch chuẩn đọc nốt
       ctx.strokeStyle = "rgba(198, 40, 40, 0.85)";
       ctx.lineWidth = 2.2;
       ctx.beginPath();
@@ -2122,6 +2079,7 @@
       ctx.closePath();
       ctx.fill();
 
+      // Hộp chứa Khóa Sol & Khóa Fa bên trái
       ctx.fillStyle = "#F5E9D6";
       ctx.fillRect(0, 0, 44, bannerHeight - 2);
       ctx.strokeStyle = "#C7B299";
@@ -2131,20 +2089,25 @@
       ctx.lineTo(44, bannerHeight - 2);
       ctx.stroke();
 
-      ctx.fillStyle = "#3E2723";
-      ctx.font = "34px serif";
-      ctx.textAlign = "center";
-      ctx.fillText("𝄞", 16, bottomLineY - 2);
+      if (drawTreble) {
+        ctx.fillStyle = "#3E2723";
+        ctx.font = "30px serif";
+        ctx.textAlign = "center";
+        ctx.fillText("𝄞", 16, trebleBottomY - 2);
+      }
 
-      ctx.font = "700 13px Lexend";
-      ctx.fillText(String(songData.beats), 34, topLineY + 13);
-      ctx.fillText(String(songData.beatType), 34, bottomLineY - 2);
+      if (drawBass) {
+        ctx.fillStyle = "#3E2723";
+        ctx.font = "26px serif";
+        ctx.textAlign = "center";
+        ctx.fillText("𝄢", 16, bassBottomY - 2);
+      }
 
       ctx.restore();
     }
 
     /********************************************************************
-     * 10. VẼ MÀN HÌNH NỐT RƠI SYNTHESIA & BÀN PHÍM CO GIÃN TỰ ĐỘNG
+     * 10. VẼ NỐT RƠI & TÔ MÀU VÀNG ĐẬM CHO PHÍM ĐÔ4 (MIDDLE C)
      ********************************************************************/
     function drawSynthesiaStage(timestamp) {
       if (!lastFrameTime) lastFrameTime = timestamp;
@@ -2156,16 +2119,16 @@
       const width = canvas.clientWidth;
       const height = canvas.clientHeight;
       const keyboardHeight = 20;
-      const topBannerH = showSheetStaff ? STAFF_BANNER_HEIGHT : 0;
+      const isTwoStaff = sheetClefMode === "both" || (sheetClefMode === "auto" && songData && songData.isTwoHandPianoSheet);
+      const activeBannerH = showSheetStaff ? (isTwoStaff ? staffBannerHeight2 : staffBannerHeight1) : 0;
       const hitLineY = height - keyboardHeight;
-      const fallingAreaHeight = Math.max(50, hitLineY - topBannerH);
+      const fallingAreaHeight = Math.max(50, hitLineY - activeBannerH);
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       ctx.fillStyle = "#EFE4D2";
       ctx.fillRect(0, 0, width, height);
 
-      // 1. TỰ ĐỘNG QUÉT ĐÚNG QUÃNG PHÍM CẦN DÙNG
       let minMidi = 48;
       let maxMidi = 72;
 
@@ -2220,10 +2183,9 @@
       const pressedKeysMap = new Map();
       const lyricsToDraw = [];
 
-      // Cắt vùng vẽ (Clip) cho khu vực nốt rơi để cả nốt và ô Lyric trượt mượt mà
       ctx.save();
       ctx.beginPath();
-      ctx.rect(0, topBannerH, width, fallingAreaHeight);
+      ctx.rect(0, activeBannerH, width, fallingAreaHeight);
       ctx.clip();
 
       ctx.strokeStyle = "rgba(109, 76, 65, 0.16)";
@@ -2232,7 +2194,7 @@
         if (m % 12 === 0) {
           const kx = keyGeometry[m].x;
           ctx.beginPath();
-          ctx.moveTo(kx, topBannerH);
+          ctx.moveTo(kx, activeBannerH);
           ctx.lineTo(kx, hitLineY);
           ctx.stroke();
         }
@@ -2246,7 +2208,7 @@
         ctx.lineWidth = 1.5;
         songData.measuresInfo.forEach((m) => {
           const dy = hitLineY - (m.startQuarter - currentBeat) * pixelsPerQuarter;
-          if (dy >= topBannerH && dy <= hitLineY) {
+          if (dy >= activeBannerH && dy <= hitLineY) {
             ctx.beginPath();
             ctx.moveTo(0, dy);
             ctx.lineTo(width, dy);
@@ -2278,7 +2240,7 @@
           pressedKeysMap.set(n.midi, n.hand);
         }
 
-        if (noteBottomY < topBannerH || noteTopY > hitLineY) return;
+        if (noteBottomY < activeBannerH || noteTopY > hitLineY) return;
 
         const barColor = n.hand === "rh" ? "#1F7A68" : "#D97724";
         const borderColor = n.hand === "rh" ? "#114B3E" : "#9E500F";
@@ -2286,7 +2248,7 @@
         const pad = geom.isBlack ? 1 : 2;
         const bx = geom.x + pad;
         const bw = geom.w - pad * 2;
-        const clampedTop = Math.max(topBannerH, noteTopY);
+        const clampedTop = Math.max(activeBannerH, noteTopY);
         const clampedBottom = Math.min(hitLineY, noteBottomY);
         const clampedH = Math.max(0, clampedBottom - clampedTop);
 
@@ -2308,7 +2270,6 @@
             ctx.fillText(label, bx + bw / 2, clampedBottom - 4);
           }
 
-          // Lấy thông tin Lyric đã được cố định sẵn trong rebuildActiveNotes()
           const showLyricOnFalling = showLyricMode === "both" || showLyricMode === "falling";
           if (showLyricOnFalling && n.lyricGroup) {
             const grp = n.lyricGroup;
@@ -2319,14 +2280,13 @@
               text: grp.lyric,
               leftEdgeX: minGeom.x + 2,
               rightEdgeX: maxGeom.x + maxGeom.w - 2,
-              bottomY: clampedBottom, // Căn bằng tuyệt đối với cạnh dưới của thanh nốt nhạc
+              bottomY: clampedBottom,
               side: grp.side
             });
           }
         }
       });
 
-      // Vẽ ô Lyric đứng yên bên cạnh thanh nốt, căn bằng cạnh dưới
       lyricsToDraw.forEach((item) => {
         ctx.font = `700 ${LYRIC_FONT_SIZE}px Lexend`;
         ctx.textAlign = "left";
@@ -2334,19 +2294,11 @@
         const boxWidth = textWidth + 8;
         const boxHeight = LYRIC_FONT_SIZE + 6;
 
-        // Cạnh dưới của ô Lyric bằng đúng cạnh dưới của thanh nốt (item.bottomY)
         const boxY = item.bottomY - boxHeight;
+        let boxX = item.rightEdgeX + 4;
 
-        let boxX = item.side === "right"
-          ? item.rightEdgeX + 4
-          : item.leftEdgeX - boxWidth - 4;
-
-        // Chống tràn khỏi mép phải hoặc mép trái màn hình
         if (boxX + boxWidth > width - 4) {
           boxX = item.leftEdgeX - boxWidth - 4;
-        }
-        if (boxX < 4) {
-          boxX = item.rightEdgeX + 4;
         }
 
         ctx.fillStyle = `rgba(253, 249, 241, ${lyricBgOpacity})`;
@@ -2363,14 +2315,12 @@
         ctx.textBaseline = "alphabetic";
       });
 
-      ctx.restore(); // Kết thúc vùng clip của khu vực nốt rơi
+      ctx.restore();
 
-      // Vẽ dòng khuông nhạc 5 dòng kẻ chạy ngang ở phía trên (nếu bật)
       if (showSheetStaff) {
-        drawScrollingSheetStaff(width, topBannerH);
+        drawScrollingSheetStaff(width, activeBannerH);
       }
 
-      // Vẽ bàn phím Piano ở cạnh dưới cùng
       ctx.fillStyle = "#5D4037";
       ctx.fillRect(0, hitLineY - 3, width, 4);
 
@@ -2382,6 +2332,8 @@
           ctx.fillStyle = "#4DB6AC";
         } else if (activeHand === "lh") {
           ctx.fillStyle = "#FFB74D";
+        } else if (m === 60) {
+          ctx.fillStyle = "#F59E0B"; // Tô màu vàng đậm cho phím Đô4 (Middle C)
         } else {
           ctx.fillStyle = "#FFFDF9";
         }
@@ -2391,7 +2343,7 @@
         ctx.fillRect(g.x, hitLineY, g.w, keyboardHeight);
         ctx.strokeRect(g.x, hitLineY, g.w, keyboardHeight);
 
-        ctx.fillStyle = activeHand ? "#212121" : "#5D4037";
+        ctx.fillStyle = activeHand ? "#212121" : (m === 60 ? "#3E2723" : "#5D4037");
         ctx.font = m % 12 === 0 ? "700 12px Lexend" : "500 11px Lexend";
         ctx.textAlign = "center";
         const octaveNum = Math.floor(m / 12) - 1;
@@ -2424,7 +2376,7 @@
     }
 
     /********************************************************************
-     * 11. SỰ KIỆN NÚT BẤM, PHÍM SPACE & CÀI ĐẶT
+     * 11. SỰ KIỆN NÚT BẤM, FULLSCREEN & CÀI ĐẶT
      ********************************************************************/
     function updateTempoDisplay() {
       document.getElementById("tempoDisplay").textContent = `${currentBpm} BPM`;
@@ -2470,6 +2422,20 @@
 
     document.getElementById("btnPlayPause").addEventListener("click", () => {
       togglePlayPause();
+    });
+
+    // Chức năng Full màn hình và tự khóa ngang (nếu trình duyệt hỗ trợ)
+    document.getElementById("btnFullscreen").addEventListener("click", () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+        if (screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock("landscape").catch(() => {});
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
     });
 
     window.addEventListener("keydown", (e) => {
@@ -2524,6 +2490,7 @@
       rebuildActiveNotes();
     });
 
+    // Quản lý Modal Chọn câu tập & nhập nhanh kiểu PC
     const phrasesModal = document.getElementById("phrasesModal");
     document.getElementById("btnOpenPhrases").addEventListener("click", () => {
       phrasesModal.classList.add("open");
@@ -2531,25 +2498,50 @@
     document.getElementById("btnClosePhrases").addEventListener("click", () => {
       phrasesModal.classList.remove("open");
     });
+    phrasesModal.addEventListener("click", (e) => {
+      if (e.target === phrasesModal) phrasesModal.classList.remove("open");
+    });
+
+    const phraseRangeInput = document.getElementById("phraseRangeInput");
+    phraseRangeInput.addEventListener("input", (e) => {
+      selectedPhraseIndices = parsePhraseRangeInput(e.target.value);
+      renderPhraseModalGrid();
+      updatePhraseButtonLabel();
+      resetCursorToFirstSelectedPhrase();
+    });
+
     document.getElementById("btnModalSelectAll").addEventListener("click", () => {
       phrases.forEach((_, idx) => selectedPhraseIndices.add(idx));
       renderPhraseModalGrid();
       updatePhraseButtonLabel();
+      updatePhraseRangeInputFromSelection();
       resetCursorToFirstSelectedPhrase();
     });
     document.getElementById("btnModalClear").addEventListener("click", () => {
       selectedPhraseIndices.clear();
       renderPhraseModalGrid();
       updatePhraseButtonLabel();
+      updatePhraseRangeInputFromSelection();
       resetCursorToFirstSelectedPhrase();
     });
 
+    // Quản lý Modal Cài đặt (Bấm ra ngoài để đóng)
     const settingsModal = document.getElementById("settingsModal");
     document.getElementById("btnOpenSettings").addEventListener("click", () => {
       settingsModal.classList.add("open");
     });
     document.getElementById("btnCloseSettings").addEventListener("click", () => {
       settingsModal.classList.remove("open");
+    });
+    settingsModal.addEventListener("click", (e) => {
+      if (e.target === settingsModal) settingsModal.classList.remove("open");
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        phrasesModal.classList.remove("open");
+        settingsModal.classList.remove("open");
+      }
     });
 
     const showSheetStaffSelect = document.getElementById("showSheetStaffSelect");
@@ -2559,11 +2551,40 @@
       localStorage.setItem("piano_showSheetStaff", e.target.value);
     });
 
+    const sheetClefModeSelect = document.getElementById("sheetClefModeSelect");
+    sheetClefModeSelect.value = sheetClefMode;
+    sheetClefModeSelect.addEventListener("change", (e) => {
+      sheetClefMode = e.target.value;
+      localStorage.setItem("piano_sheetClefMode", sheetClefMode);
+    });
+
     const showSheetLyricSelect = document.getElementById("showSheetLyricSelect");
     showSheetLyricSelect.value = showLyricMode;
     showSheetLyricSelect.addEventListener("change", (e) => {
       showLyricMode = e.target.value;
       localStorage.setItem("piano_showLyricMode", showLyricMode);
+    });
+
+    // Thanh trượt điều chỉnh độ cao Sheet khi 1 khóa
+    const staffHeight1Range = document.getElementById("staffHeight1Range");
+    const staffHeight1Display = document.getElementById("staffHeight1Display");
+    staffHeight1Range.value = staffBannerHeight1;
+    staffHeight1Display.textContent = `${staffBannerHeight1} px`;
+    staffHeight1Range.addEventListener("input", (e) => {
+      staffBannerHeight1 = parseInt(e.target.value, 10);
+      staffHeight1Display.textContent = `${staffBannerHeight1} px`;
+      localStorage.setItem("piano_staffHeight1", String(staffBannerHeight1));
+    });
+
+    // Thanh trượt điều chỉnh độ cao Sheet khi 2 khóa
+    const staffHeight2Range = document.getElementById("staffHeight2Range");
+    const staffHeight2Display = document.getElementById("staffHeight2Display");
+    staffHeight2Range.value = staffBannerHeight2;
+    staffHeight2Display.textContent = `${staffBannerHeight2} px`;
+    staffHeight2Range.addEventListener("input", (e) => {
+      staffBannerHeight2 = parseInt(e.target.value, 10);
+      staffHeight2Display.textContent = `${staffBannerHeight2} px`;
+      localStorage.setItem("piano_staffHeight2", String(staffBannerHeight2));
     });
 
     const lyricBgOpacityRange = document.getElementById("lyricBgOpacityRange");
@@ -2641,6 +2662,13 @@
       document.getElementById("newPatternMeters").value = "";
       savePatternsToLocal();
     });
+
+    // Đăng ký Service Worker cho PWA
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js").catch(() => {});
+      });
+    }
 
     (async function bootstrap() {
       await loadPatterns();
