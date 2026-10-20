@@ -1,0 +1,10 @@
+{
+  "name": "Tập luyện Piano",
+  "short_name": "Piano",
+  "start_url": "index.html",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#F6EFE2",
+  "theme_color": "#F6EFE2",
+  "icons": []
+}
