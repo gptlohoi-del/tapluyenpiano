@@ -1870,6 +1870,42 @@
       };
     }
 
+    // HÀM VẼ KHÓA SOL VÀ SỐ CHỈ NHỊP CỐ ĐỊNH Ở CẠNH TRÁI
+      function drawFixedClefBox(width, bannerHeight) {
+        ctx.save();
+        // Nền ô chứa khóa nhạc
+        ctx.fillStyle = "#F5E9D6";
+        ctx.fillRect(0, 0, 48, bannerHeight);
+        ctx.strokeStyle = "#C7B299";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(48, 0);
+        ctx.lineTo(48, bannerHeight);
+        ctx.stroke();
+
+        const lineSpacing = 8;
+        const showLyricOnSheet = showLyricMode === "both" || showLyricMode === "sheet";
+        const topLineY = showLyricOnSheet ? 16 : 22;
+        const bottomLineY = topLineY + 4 * lineSpacing;
+
+        // Vẽ ký hiệu Khóa Sol (𝄞)
+        ctx.fillStyle = "#3E2723";
+        ctx.font = "32px serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("𝄞", 20, topLineY + 2 * lineSpacing + 2);
+
+        // Vẽ Số chỉ nhịp (VD: 4/4) ngay bên cạnh Khóa Sol
+        if (songData) {
+          ctx.font = "700 12px Lexend";
+          ctx.textAlign = "left";
+          ctx.textBaseline = "alphabetic";
+          ctx.fillText(String(songData.beats), 34, topLineY + 12);
+          ctx.fillText(String(songData.beatType), 34, bottomLineY - 2);
+        }
+        ctx.restore();
+      }
+
     function drawScrollingSheetStaff(width, bannerHeight) {
       ctx.save();
       ctx.fillStyle = "#FDF9F1";
@@ -1985,81 +2021,298 @@
       );
 
       const rx = 4.8;
-      const ry = 3.4;
+      const ry = 3.5;
 
+      // 1. Tính tọa độ và hướng đuôi nốt (Dưới dòng kẻ 3 B4=34 thì đuôi quay LÊN, từ B4 trở lên đuôi quay XUỐNG)
       chordGroups.forEach((grp) => {
         grp.x = playheadX + (grp.startQuarter - currentBeat) * pxPerQuarter;
         grp.isActive = !isCountingIn && currentBeat >= grp.startQuarter - 0.03 && currentBeat < grp.startQuarter + grp.durationQuarter;
 
-        grp.noteItems = grp.notes.map((n) => {
-          if (n.isRest) {
-            return { isRest: true, raw: n, y: trebleTopY + 2 * lineSpacing };
-          }
+        const pitchedNotes = grp.notes.filter((n) => !n.isRest);
+        grp.isRestOnly = pitchedNotes.length === 0;
+
+        grp.noteItems = pitchedNotes.map((n) => {
           const info = getSheetDiatonicInfo(n);
-          // Định vị tọa độ Y theo Khóa Sol hoặc Khóa Fa
           const isBass = n.midi < 60 && drawBass;
           const targetBottomY = isBass ? bassBottomY : trebleBottomY;
-          const refStep = isBass ? 22 : 30; // C3 = 22 (Khóa Fa dòng kẻ 3), E4 = 30 (Khóa Sol dòng kẻ 1)
+          const refStep = isBass ? 18 : 30; // G2 = 18 (Khóa Fa dòng 1), E4 = 30 (Khóa Sol dòng 1)
           const y = targetBottomY - (info.diatonicStep - refStep) * (lineSpacing / 2);
-          return {
-            isRest: false,
-            raw: n,
-            diatonicStep: info.diatonicStep,
-            acc: info.acc,
-            y
-          };
-        }).sort((a, b) => (a.diatonicStep || 0) - (b.diatonicStep || 0));
+          return { raw: n, diatonicStep: info.diatonicStep, acc: info.acc, y };
+        }).sort((a, b) => a.diatonicStep - b.diatonicStep);
+
+        if (!grp.isRestOnly) {
+          grp.lowestY = grp.noteItems[0].y;
+          grp.highestY = grp.noteItems[grp.noteItems.length - 1].y;
+          grp.lowestStep = grp.noteItems[0].diatonicStep;
+          grp.highestStep = grp.noteItems[grp.noteItems.length - 1].diatonicStep;
+          const avgStep = (grp.lowestStep + grp.highestStep) / 2;
+          grp.stemDown = avgStep >= 34; // Dưới dòng 3 (B4) thì stemDown = false (đuôi quay lên)
+        }
       });
 
-      // Vẽ nốt nhạc và dấu lặng lên Sheet
+      // 2. Gom nhóm chùm nốt móc đơn / móc kép (Beams)
+      const beamClusters = [];
+      let currentCluster = [];
+      chordGroups.forEach((grp) => {
+        const isBeamable = !grp.isRestOnly && grp.durationQuarter <= 0.55;
+        if (!isBeamable) {
+          if (currentCluster.length >= 2) beamClusters.push(currentCluster);
+          currentCluster = [];
+          return;
+        }
+        if (currentCluster.length === 0) {
+          currentCluster.push(grp);
+        } else {
+          const prev = currentCluster[currentCluster.length - 1];
+          const gap = grp.startQuarter - (prev.startQuarter + prev.durationQuarter);
+          const sameMeasure = grp.measureIndex === prev.measureIndex;
+          const beamBreak = prev.beamState === "end" || grp.beamState === "begin";
+          if (sameMeasure && Math.abs(gap) < 0.08 && !beamBreak && currentCluster.length < 4) {
+            currentCluster.push(grp);
+          } else {
+            if (currentCluster.length >= 2) beamClusters.push(currentCluster);
+            currentCluster = [grp];
+          }
+        }
+      });
+      if (currentCluster.length >= 2) beamClusters.push(currentCluster);
+
+      const beamedSet = new Set();
+      beamClusters.forEach((cluster) => {
+        const avg = cluster.reduce((sum, g) => sum + (g.lowestStep + g.highestStep) / 2, 0) / cluster.length;
+        const clusterStemDown = avg >= 34;
+        cluster.forEach((g) => {
+          g.stemDown = clusterStemDown;
+          beamedSet.add(g);
+        });
+      });
+
+      // 3. Hàm vẽ đầy đủ mọi loại Dấu Lặng bằng Canvas (Không bao giờ bị lỗi thiếu font)
+      function drawCanvasRest(x, topY, spacing, durQ, color) {
+        ctx.save();
+        ctx.fillStyle = color;
+        ctx.strokeStyle = color;
+        const midY = topY + 2 * spacing; // Dòng kẻ 3 (giữa khuông)
+        if (durQ >= 3.5) {
+          // Lặng tròn: Hình chữ nhật treo dưới dòng kẻ 4 (topY + spacing)
+          ctx.fillRect(x - 6, topY + spacing, 12, spacing * 0.55);
+        } else if (durQ >= 1.75) {
+          // Lặng trắng: Hình chữ nhật nằm trên dòng kẻ 3 (midY)
+          ctx.fillRect(x - 6, midY - spacing * 0.55, 12, spacing * 0.55);
+        } else if (durQ >= 0.85) {
+          // Lặng đen: Đường gấp khúc chuẩn
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(x - 2, midY - spacing * 1.1);
+          ctx.lineTo(x + 3, midY - spacing * 0.3);
+          ctx.lineTo(x - 3, midY + spacing * 0.3);
+          ctx.lineTo(x + 2, midY + spacing * 0.9);
+          ctx.quadraticCurveTo(x - 4, midY + spacing * 1.3, x - 3, midY + spacing * 0.7);
+          ctx.stroke();
+        } else {
+          // Lặng móc đơn (1 móc) hoặc Lặng móc kép (2 móc)
+          const is16th = durQ <= 0.3;
+          ctx.lineWidth = 1.6;
+          ctx.beginPath();
+          ctx.moveTo(x + 3, midY - spacing * 0.8);
+          ctx.lineTo(x - 2, midY + spacing * 1.1);
+          ctx.stroke();
+          // Móc thứ 1
+          ctx.beginPath();
+          ctx.arc(x - 2, midY - spacing * 0.5, 2.3, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.moveTo(x - 2, midY - spacing * 0.3);
+          ctx.quadraticCurveTo(x + 1, midY - spacing * 0.2, x + 2.5, midY - spacing * 0.6);
+          ctx.stroke();
+          // Móc thứ 2 (nếu là lặng móc kép)
+          if (is16th) {
+            ctx.beginPath();
+            ctx.arc(x - 3.5, midY + spacing * 0.2, 2.3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(x - 3.5, midY + spacing * 0.4);
+            ctx.quadraticCurveTo(x - 0.5, midY + spacing * 0.5, x + 1, midY + spacing * 0.1);
+            ctx.stroke();
+          }
+        }
+        ctx.restore();
+      }
+
+      // 4. Vẽ Dấu lặng, Dòng kẻ phụ, Đầu nốt, Đuôi nốt lẻ và Móc đơn/Móc kép
       chordGroups.forEach((grp, gIdx) => {
         if (grp.x < 42 || grp.x > width + 20) return;
-
         const noteColor = grp.isActive ? "#C62828" : "#1E1410";
 
-        grp.noteItems.forEach((item) => {
-          if (item.isRest) {
-            // Vẽ dấu lặng tương ứng theo thời lượng (nốt trắng/đen/móc)
-            ctx.fillStyle = noteColor;
-            ctx.font = "bold 16px serif";
-            ctx.textAlign = "center";
-            let restSymbol = "𝄽"; // Lặng đen mặc định
-            if (item.raw.durationQuarter >= 3.8) restSymbol = "𝄻"; // Lặng tròn
-            else if (item.raw.durationQuarter >= 1.95) restSymbol = "𝄼"; // Lặng trắng
-            else if (item.raw.durationQuarter <= 0.28) restSymbol = "𝄿"; // Lặng móc kép
-            else if (item.raw.durationQuarter <= 0.55) restSymbol = "𝄾"; // Lặng đơn
-            ctx.fillText(restSymbol, grp.x, trebleTopY + 2 * lineSpacing + 5);
-            return;
-          }
+        if (grp.isRestOnly) {
+          drawCanvasRest(grp.x, trebleTopY, lineSpacing, grp.durationQuarter, noteColor);
+          return;
+        }
 
-          const isHollow = item.raw.durationQuarter >= 1.95;
+        const isHollow = grp.durationQuarter >= 1.95;
+        const isWhole = grp.durationQuarter >= 3.8;
+
+        // Dòng kẻ phụ dưới E4 (<= 28) và trên F5 (>= 40)
+        ctx.strokeStyle = "#4E342E";
+        ctx.lineWidth = 1.2;
+        if (grp.lowestStep <= 28) {
+          for (let st = 28; st >= grp.lowestStep; st -= 2) {
+            const ly = trebleBottomY - (st - 30) * (lineSpacing / 2);
+            ctx.beginPath();
+            ctx.moveTo(grp.x - rx - 4, ly);
+            ctx.lineTo(grp.x + rx + 4, ly);
+            ctx.stroke();
+          }
+        }
+        if (grp.highestStep >= 40) {
+          for (let st = 40; st <= grp.highestStep; st += 2) {
+            const ly = trebleBottomY - (st - 30) * (lineSpacing / 2);
+            ctx.beginPath();
+            ctx.moveTo(grp.x - rx - 4, ly);
+            ctx.lineTo(grp.x + rx + 4, ly);
+            ctx.stroke();
+          }
+        }
+
+        // Vẽ đầu nốt, chấm dôi, dấu hóa, dấu nối (tie)
+        grp.noteItems.forEach((item) => {
           ctx.fillStyle = noteColor;
           ctx.strokeStyle = noteColor;
-          ctx.lineWidth = 1.5;
-
+          ctx.lineWidth = 1.6;
           ctx.beginPath();
           ctx.ellipse(grp.x, item.y, rx, ry, -0.32, 0, Math.PI * 2);
           if (isHollow) ctx.stroke();
           else ctx.fill();
 
-          if (item.raw.isDotted) {
+          if (grp.isDotted) {
             ctx.beginPath();
-            ctx.arc(grp.x + rx + 4, item.y - 1, 1.6, 0, Math.PI * 2);
+            ctx.arc(grp.x + rx + 4, item.y - 1, 1.8, 0, Math.PI * 2);
             ctx.fill();
           }
-
           if (item.acc) {
             ctx.font = "700 11px Lexend";
             ctx.textAlign = "right";
             ctx.fillText(item.acc === "#" ? "♯" : "♭", grp.x - rx - 2, item.y + 4);
           }
+          if (item.raw.hasTieStart) {
+            const nextGrp = chordGroups[gIdx + 1];
+            const endX = nextGrp ? nextGrp.x : grp.x + grp.durationQuarter * pxPerQuarter;
+            if (endX > grp.x + 6) {
+              ctx.beginPath();
+              const midTieX = (grp.x + endX) / 2;
+              const dir = grp.stemDown ? -1 : 1;
+              ctx.moveTo(grp.x + rx, item.y + dir * 3);
+              ctx.quadraticCurveTo(midTieX, item.y + dir * 10, endX - rx, item.y + dir * 3);
+              ctx.stroke();
+            }
+          }
         });
+
+        // Vẽ đuôi nốt (Stem) và cờ móc đơn / móc kép (Flags) cho nốt đứng lẻ (như chữ "Đoàn")
+        if (!beamedSet.has(grp) && !isWhole) {
+          ctx.strokeStyle = noteColor;
+          ctx.lineWidth = 1.5;
+          const is8th = grp.durationQuarter <= 0.55;
+          const is16th = grp.durationQuarter <= 0.3;
+
+          if (grp.stemDown) {
+            const stemX = grp.x - rx + 0.8;
+            const stemBotY = grp.lowestY + 22;
+            ctx.beginPath();
+            ctx.moveTo(stemX, grp.highestY);
+            ctx.lineTo(stemX, stemBotY);
+            ctx.stroke();
+            if (is8th) {
+              ctx.beginPath();
+              ctx.moveTo(stemX, stemBotY);
+              ctx.quadraticCurveTo(stemX + 8, stemBotY - 5, stemX + 6, stemBotY - 12);
+              ctx.stroke();
+            }
+            if (is16th) {
+              ctx.beginPath();
+              ctx.moveTo(stemX, stemBotY - 6);
+              ctx.quadraticCurveTo(stemX + 8, stemBotY - 11, stemX + 6, stemBotY - 18);
+              ctx.stroke();
+            }
+          } else {
+            const stemX = grp.x + rx - 0.8;
+            const stemTopY = grp.highestY - 22;
+            ctx.beginPath();
+            ctx.moveTo(stemX, grp.lowestY);
+            ctx.lineTo(stemX, stemTopY);
+            ctx.stroke();
+            if (is8th) {
+              ctx.beginPath();
+              ctx.moveTo(stemX, stemTopY);
+              ctx.quadraticCurveTo(stemX + 8, stemTopY + 5, stemX + 6, stemTopY + 12);
+              ctx.stroke();
+            }
+            if (is16th) {
+              ctx.beginPath();
+              ctx.moveTo(stemX, stemTopY + 6);
+              ctx.quadraticCurveTo(stemX + 8, stemTopY + 11, stemX + 6, stemTopY + 18);
+              ctx.stroke();
+            }
+          }
+        }
 
         if (showLyricOnSheet && grp.lyric) {
           ctx.font = `700 ${grp.isActive ? 13 : 12}px Lexend`;
           ctx.fillStyle = grp.isActive ? "#C62828" : `rgba(62, 39, 35, ${lyricTextOpacity})`;
           ctx.textAlign = "center";
           ctx.fillText(grp.lyric, grp.x, bannerHeight - 6);
+        }
+      });
+
+      // 5. Vẽ dầm nối ngang (Beams) cho chùm nốt móc đơn & móc kép (như chữ "quân Việt")
+      beamClusters.forEach((cluster) => {
+        const first = cluster[0];
+        const last = cluster[cluster.length - 1];
+        if (last.x < 42 || first.x > width + 20) return;
+
+        const stemDown = first.stemDown;
+        const firstStemX = stemDown ? first.x - rx + 0.8 : first.x + rx - 0.8;
+        const lastStemX = stemDown ? last.x - rx + 0.8 : last.x + rx - 0.8;
+
+        let beamStartY, beamEndY;
+        if (stemDown) {
+          const maxLow = Math.max(...cluster.map((g) => g.lowestY));
+          const slope = Math.max(-6, Math.min(6, last.lowestY - first.lowestY));
+          beamStartY = maxLow + 20 - slope / 2;
+          beamEndY = maxLow + 20 + slope / 2;
+        } else {
+          const minHigh = Math.min(...cluster.map((g) => g.highestY));
+          const slope = Math.max(-6, Math.min(6, last.highestY - first.highestY));
+          beamStartY = minHigh - 20 - slope / 2;
+          beamEndY = minHigh - 20 + slope / 2;
+        }
+
+        ctx.strokeStyle = "#1E1410";
+        ctx.lineWidth = 1.5;
+        cluster.forEach((g) => {
+          const sx = stemDown ? g.x - rx + 0.8 : g.x + rx - 0.8;
+          const t = lastStemX === firstStemX ? 0 : (sx - firstStemX) / (lastStemX - firstStemX);
+          const targetY = beamStartY + t * (beamEndY - beamStartY);
+          ctx.beginPath();
+          ctx.moveTo(sx, stemDown ? g.highestY : g.lowestY);
+          ctx.lineTo(sx, targetY);
+          ctx.stroke();
+        });
+
+        // Vạch dầm số 1 (móc đơn)
+        ctx.lineWidth = 3.6;
+        ctx.beginPath();
+        ctx.moveTo(firstStemX - 0.5, beamStartY);
+        ctx.lineTo(lastStemX + 0.5, beamEndY);
+        ctx.stroke();
+
+        // Vạch dầm số 2 (nếu có nốt móc kép <= 0.3 phách như "quân Việt")
+        if (cluster.some((g) => g.durationQuarter <= 0.3)) {
+          const offset2 = stemDown ? -5.5 : 5.5;
+          ctx.beginPath();
+          ctx.moveTo(firstStemX - 0.5, beamStartY + offset2);
+          ctx.lineTo(lastStemX + 0.5, beamEndY + offset2);
+          ctx.stroke();
         }
       });
 
@@ -2080,21 +2333,23 @@
       ctx.fill();
 
       // Hộp chứa Khóa Sol & Khóa Fa bên trái
-      ctx.fillStyle = "#F5E9D6";
-      ctx.fillRect(0, 0, 44, bannerHeight - 2);
-      ctx.strokeStyle = "#C7B299";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(44, 0);
-      ctx.lineTo(44, bannerHeight - 2);
-      ctx.stroke();
+      // ctx.fillStyle = "#F5E9D6";
+      // ctx.fillRect(0, 0, 44, bannerHeight - 2);
+      // ctx.strokeStyle = "#C7B299";
+      // ctx.lineWidth = 1;
+      // ctx.beginPath();
+      // ctx.moveTo(44, 0);
+      // ctx.lineTo(44, bannerHeight - 2);
+      // ctx.stroke();
 
-      if (drawTreble) {
-        ctx.fillStyle = "#3E2723";
-        ctx.font = "30px serif";
-        ctx.textAlign = "center";
-        ctx.fillText("𝄞", 16, trebleBottomY - 2);
-      }
+      // if (drawTreble) {
+      //   ctx.fillStyle = "#3E2723";
+      //   ctx.font = "30px serif";
+      //   ctx.textAlign = "center";
+      //   ctx.fillText("𝄞", 16, trebleBottomY - 2);
+      // }
+
+      drawFixedClefBox(width, bannerHeight);
 
       if (drawBass) {
         ctx.fillStyle = "#3E2723";
@@ -2333,7 +2588,7 @@
         } else if (activeHand === "lh") {
           ctx.fillStyle = "#FFB74D";
         } else if (m === 60) {
-          ctx.fillStyle = "#F59E0B"; // Tô màu vàng đậm cho phím Đô4 (Middle C)
+          ctx.fillStyle = "#1EFF00"; // Tô màu vàng đậm cho phím Đô4 (Middle C)
         } else {
           ctx.fillStyle = "#FFFDF9";
         }
