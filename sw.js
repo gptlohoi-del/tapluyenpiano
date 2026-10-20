@@ -1,4 +1,4 @@
-const CACHE_NAME = "piano-pwa-v3"; // Cứ đổi số v2, v3... khi cần ép xóa cache cũ
+const CACHE_NAME = "piano-pwa-v1"; // Cứ đổi số v2, v3... khi cần ép xóa cache cũ
 
 self.addEventListener("install", (e) => {
   self.skipWaiting(); // Kích hoạt ngay Service Worker mới mà không cần đợi đóng tab
