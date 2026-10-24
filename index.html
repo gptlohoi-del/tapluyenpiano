@@ -2043,9 +2043,9 @@
           const info = getSheetDiatonicInfo(n);
           const isBass = n.midi < 60 && drawBass;
           const targetBottomY = isBass ? bassBottomY : trebleBottomY;
-          const refStep = isBass ? 18 : 30; // G2 = 18 (Khóa Fa dòng 1), E4 = 30 (Khóa Sol dòng 1)
+          const refStep = isBass ? 22 : 30; // G2/A2 -> Đổi chuẩn rọi Khóa Fa (A2 = 22 là khe 2 hoặc C3 = 22)
           const y = targetBottomY - (info.diatonicStep - refStep) * (lineSpacing / 2);
-          return { raw: n, diatonicStep: info.diatonicStep, acc: info.acc, y };
+          return { raw: n, diatonicStep: info.diatonicStep, acc: info.acc, y, isBass };
         }).sort((a, b) => a.diatonicStep - b.diatonicStep);
 
         if (!grp.isRestOnly) {
