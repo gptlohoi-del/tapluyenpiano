@@ -1091,6 +1091,8 @@
             const isRest = child.querySelector("rest") !== null;
             const noteType = child.querySelector("type")?.textContent.trim() || "";
             const isDotted = child.querySelector("dot") !== null;
+            const voice = child.querySelector("voice")?.textContent.trim() || "1";
+            const isFullMeasureRest = child.querySelector("rest")?.getAttribute("measure") === "yes";
 
             if (isRest) {
               if (staffNum === 1) {
@@ -1099,13 +1101,18 @@
                   durationQuarter: durQuarter,
                   measureIndex: mIdx
                 });
-                // Lưu dấu lặng vào rawSheetNotes để vẽ lên khuông nhạc
+              }
+              if (staffNum === 1 || staffNum === 2) {
                 rawSheetNotes.push({
                   isRest: true,
+                  staff: staffNum,
+                  voice,
                   startQuarter: noteStartQuarter,
                   durationQuarter: durQuarter,
                   measureIndex: mIdx,
-                  noteType
+                  noteType,
+                  isDotted,
+                  fullMeasure: isFullMeasureRest
                 });
               }
             } else {
@@ -1133,9 +1140,11 @@
               const beamEl = child.querySelector("beam[number='1']") || child.querySelector("beam");
               const beamState = beamEl ? beamEl.textContent.trim().toLowerCase() : "";
 
-              if (staffNum === 1) {
+              if (staffNum === 1 || staffNum === 2) {
                 rawSheetNotes.push({
                   isRest: false,
+                  staff: staffNum,
+                  voice,
                   midi,
                   step,
                   alter,
@@ -1252,18 +1261,47 @@
               const durDiv = parseInt(ch.querySelector("duration")?.textContent || "0", 10);
               const durQ = durDiv / p2Divisions;
               const startDiv = isChord ? Math.max(0, localCur - durDiv) : localCur;
-              if (!ch.querySelector("rest")) {
+              const typeTxt = ch.querySelector("type")?.textContent.trim() || "";
+              const dotted2 = ch.querySelector("dot") !== null;
+              const voice2 = ch.querySelector("voice")?.textContent.trim() || "1";
+              const startQ2 = mStart + startDiv / p2Divisions;
+              if (ch.querySelector("rest")) {
+                rawSheetNotes.push({
+                  isRest: true,
+                  staff: 2,
+                  voice: voice2,
+                  startQuarter: startQ2,
+                  durationQuarter: durQ,
+                  measureIndex: mIdx,
+                  noteType: typeTxt,
+                  isDotted: dotted2,
+                  fullMeasure: ch.querySelector("rest")?.getAttribute("measure") === "yes"
+                });
+              } else {
                 const step = ch.querySelector("pitch > step")?.textContent.trim() || "C";
                 const alter = parseInt(ch.querySelector("pitch > alter")?.textContent || "0", 10);
                 const octave = parseInt(ch.querySelector("pitch > octave")?.textContent || "3", 10);
                 const midi = (octave + 1) * 12 + STEP_TO_SEMITONE[step] + alter;
                 rawLeftNotes.push({
                   midi,
-                  startQuarter: mStart + startDiv / p2Divisions,
+                  startQuarter: startQ2,
                   durationQuarter: durQ,
                   measureIndex: mIdx,
                   lyric: "",
                   hand: "lh"
+                });
+                rawSheetNotes.push({
+                  isRest: false,
+                  staff: 2,
+                  voice: voice2,
+                  midi, step, alter, octave,
+                  startQuarter: startQ2,
+                  durationQuarter: durQ,
+                  measureIndex: mIdx,
+                  noteType: typeTxt,
+                  isDotted: dotted2,
+                  beamState: "",
+                  lyric: ""
                 });
               }
               if (!isChord) {
@@ -1293,6 +1331,7 @@
         measuresInfo
       };
 
+      songData.hasLhInSheet = rawSheetNotes.some((n) => n.staff === 2 && !n.isRest);
       currentBpm = detectedTempo;
       transposeSemitones = 0;
       updateTempoDisplay();
@@ -1870,6 +1909,37 @@
       };
     }
 
+    // ----- BẢNG TRƯỜNG ĐỘ: dùng cho nốt tự sinh (không có thẻ <type> trong file) -----
+    const DUR_TABLE = [
+      { q: 6,     base: 4,    dotted: true  },
+      { q: 4,     base: 4,    dotted: false },
+      { q: 3,     base: 2,    dotted: true  },
+      { q: 2,     base: 2,    dotted: false },
+      { q: 1.5,   base: 1,    dotted: true  },
+      { q: 1,     base: 1,    dotted: false },
+      { q: 0.75,  base: 0.5,  dotted: true  },
+      { q: 0.5,   base: 0.5,  dotted: false },
+      { q: 0.375, base: 0.25, dotted: true  },
+      { q: 0.25,  base: 0.25, dotted: false }
+    ];
+    function classifyDur(d) {
+      d = Math.max(d, 0.1);
+      let best = DUR_TABLE[0], bd = Infinity;
+      for (const e of DUR_TABLE) {
+        const diff = Math.abs(Math.log(d / e.q));
+        if (diff < bd) { bd = diff; best = e; }
+      }
+      return best;
+    }
+    const TYPE_TO_QUARTER = { whole: 4, half: 2, quarter: 1, eighth: 0.5, "16th": 0.25, "32nd": 0.125, "64th": 0.0625 };
+    function getDurInfo(n) {
+      if (n.fullMeasure) return { base: 4, dotted: false };
+      const b = TYPE_TO_QUARTER[n.noteType];
+      if (b) return { base: b, dotted: !!n.isDotted };
+      const c = classifyDur(n.durationQuarter);
+      return { base: c.base, dotted: c.dotted };
+    }
+
     // HÀM VẼ KHÓA SOL VÀ SỐ CHỈ NHỊP CỐ ĐỊNH Ở CẠNH TRÁI
       function drawFixedClefBox(width, bannerHeight) {
         ctx.save();
@@ -2000,44 +2070,77 @@
       const minVisibleQ = currentBeat - (playheadX / pxPerQuarter) - 2;
       const maxVisibleQ = currentBeat + ((width - playheadX) / pxPerQuarter) + 2;
 
-      const lhSheetNotes = drawBass
-        ? activeNotes
-            .filter(n => n.hand === "lh" &&
-              n.startQuarter + n.durationQuarter >= minVisibleQ &&
-              n.startQuarter <= maxVisibleQ)
-            .map(n => {
-              const m = songData.measuresInfo.find(
-                mm => n.startQuarter >= mm.startQuarter - 0.02 &&
-                      n.startQuarter < mm.startQuarter + mm.durationQuarter - 0.02);
-              return {
-                isRest: false, staff: 2,
-                midi: n.midi - transposeSemitones,
-                startQuarter: n.startQuarter,
-                durationQuarter: Math.round(n.durationQuarter) >= 1 ? 1 : n.durationQuarter,
-                measureIndex: m ? m.index : 0,
-                beamState: "", isDotted: false, lyric: ""
-              };
-            })
-        : [];
-
-      // Nếu đang chọn chế độ chỉ tập tay phải thì ẩn nốt tay trái trên sheet
-      const activeLhNotes = handMode === "rh" ? [] : lhSheetNotes;
-      const allVisibleNotes = [...songData.rawSheetNotes, ...activeLhNotes].filter(
-        (n) => n.startQuarter + n.durationQuarter >= minVisibleQ && n.startQuarter <= maxVisibleQ
-      );
-
-      const chordGroupsMap = new Map();
-      allVisibleNotes.forEach((n) => {
-        const staff = (n.staff === 2 || (n.hand === "lh")) ? 2 : 1;
-        const key = `${staff}_${n.startQuarter.toFixed(3)}`;
-        if (!chordGroupsMap.has(key)) {
-          chordGroupsMap.set(key, {
-            staff,
+      // Tay trái tự sinh (bài 1 khuông): dựng nốt + dấu lặng cho khóa Fa
+      function buildAutoLhSheetNotes(minQ, maxQ) {
+        const out = [];
+        songData.measuresInfo.forEach((m) => {
+          const mEnd = m.startQuarter + m.durationQuarter;
+          if (mEnd < minQ || m.startQuarter > maxQ) return;
+          const mkRest = (st, d, full) => ({
+            isRest: true, staff: 2, voice: "1",
+            startQuarter: st, durationQuarter: d,
+            measureIndex: m.index, beamState: "", lyric: "", fullMeasure: !!full
+          });
+          const ns = activeNotes.filter((n) =>
+            n.hand === "lh" &&
+            n.startQuarter >= m.startQuarter - 0.02 &&
+            n.startQuarter < mEnd - 0.02);
+          if (ns.length === 0) {
+            out.push(mkRest(m.startQuarter, m.durationQuarter, true));
+            return;
+          }
+          ns.forEach((n) => out.push({
+            isRest: false, staff: 2, voice: "1",
+            midi: n.midi - transposeSemitones,
             startQuarter: n.startQuarter,
             durationQuarter: n.durationQuarter,
+            measureIndex: m.index, beamState: "", lyric: ""
+          }));
+          let cursor = m.startQuarter;
+          const starts = [...new Set(ns.map((n) => n.startQuarter.toFixed(3)))].map(Number).sort((a, b) => a - b);
+          starts.forEach((st) => {
+            if (st - cursor > 0.2) out.push(mkRest(cursor, st - cursor, false));
+            const end = Math.max(...ns
+              .filter((n) => Math.abs(n.startQuarter - st) < 0.001)
+              .map((n) => n.startQuarter + n.durationQuarter));
+            cursor = Math.max(cursor, end);
+          });
+          if (mEnd - cursor > 0.2) out.push(mkRest(cursor, mEnd - cursor, false));
+        });
+        return out;
+      }
+
+      const needAutoLh = drawBass && !songData.hasLhInSheet && handMode !== "rh";
+      const autoLhNotes = needAutoLh ? buildAutoLhSheetNotes(minVisibleQ, maxVisibleQ) : [];
+
+      const allVisibleNotes = [...songData.rawSheetNotes, ...autoLhNotes].filter((n) => {
+        if (n.startQuarter + n.durationQuarter < minVisibleQ || n.startQuarter > maxVisibleQ) return false;
+        if (n.staff === 2) {
+          if (!drawBass) return false;
+          if (handMode === "rh") return false;
+        } else if (!drawTreble) {
+          return false;
+        }
+        return true;
+      });
+
+      // Gom nhóm theo khuông + bè (voice) + thời điểm
+      const chordGroupsMap = new Map();
+      allVisibleNotes.forEach((n) => {
+        const staff = n.staff === 2 ? 2 : 1;
+        const voice = n.voice || "1";
+        const key = `${staff}_${voice}_${n.startQuarter.toFixed(3)}`;
+        if (!chordGroupsMap.has(key)) {
+          const di = getDurInfo(n);
+          chordGroupsMap.set(key, {
+            staff,
+            voice,
+            startQuarter: n.startQuarter,
+            durationQuarter: n.durationQuarter,
+            baseDur: di.base,
+            isDotted: di.dotted,
             measureIndex: n.measureIndex,
             beamState: n.beamState,
-            isDotted: n.isDotted,
             notes: [],
             lyric: ""
           });
@@ -2065,7 +2168,7 @@
 
         grp.noteItems = pitchedNotes.map((n) => {
           const info = getSheetDiatonicInfo(n);
-          const isBass = grp.staff === 2 || (n.midi < 60 && drawBass);
+          const isBass = grp.staff === 2 || !drawTreble;
           const targetBottomY = isBass ? bassBottomY : trebleBottomY;
           const refStep = isBass ? 18 : 30; // Sol2 = 18 (Khóa Fa dòng 1), E4 = 30 (Khóa Sol dòng 1)
           const y = targetBottomY - (info.diatonicStep - refStep) * (lineSpacing / 2);
@@ -2085,17 +2188,25 @@
 
       // 2. Gom nhóm chùm nốt móc đơn / móc kép (Beams)
       const beamClusters = [];
-      let currentCluster = [];
-      chordGroups.forEach((grp) => {
-        const isBeamable = !grp.isRestOnly && grp.durationQuarter <= 0.55;
-        if (!isBeamable) {
-          if (currentCluster.length >= 2) beamClusters.push(currentCluster);
-          currentCluster = [];
-          return;
-        }
-        if (currentCluster.length === 0) {
-          currentCluster.push(grp);
-        } else {
+      const lanes = new Map();
+      chordGroups.forEach((g) => {
+        const k = g.staff + "_" + g.voice;
+        if (!lanes.has(k)) lanes.set(k, []);
+        lanes.get(k).push(g);
+      });
+      lanes.forEach((list) => {
+        let currentCluster = [];
+        list.forEach((grp) => {
+          const isBeamable = !grp.isRestOnly && grp.baseDur <= 0.5;
+          if (!isBeamable) {
+            if (currentCluster.length >= 2) beamClusters.push(currentCluster);
+            currentCluster = [];
+            return;
+          }
+          if (currentCluster.length === 0) {
+            currentCluster.push(grp);
+            return;
+          }
           const prev = currentCluster[currentCluster.length - 1];
           const gap = grp.startQuarter - (prev.startQuarter + prev.durationQuarter);
           const sameMeasure = grp.measureIndex === prev.measureIndex;
@@ -2106,14 +2217,14 @@
             if (currentCluster.length >= 2) beamClusters.push(currentCluster);
             currentCluster = [grp];
           }
-        }
+        });
+        if (currentCluster.length >= 2) beamClusters.push(currentCluster);
       });
-      if (currentCluster.length >= 2) beamClusters.push(currentCluster);
 
       const beamedSet = new Set();
       beamClusters.forEach((cluster) => {
         const avg = cluster.reduce((sum, g) => sum + (g.lowestStep + g.highestStep) / 2, 0) / cluster.length;
-        const clusterStemDown = avg >= 34;
+        const clusterStemDown = avg >= (cluster[0].noteItems[0].isBass ? 22 : 34);
         cluster.forEach((g) => {
           g.stemDown = clusterStemDown;
           beamedSet.add(g);
@@ -2121,7 +2232,7 @@
       });
 
       // 3. Hàm vẽ đầy đủ mọi loại Dấu Lặng bằng Canvas (Không bao giờ bị lỗi thiếu font)
-      function drawCanvasRest(x, topY, spacing, durQ, color) {
+      function drawCanvasRest(x, topY, spacing, durQ, color, dotted) {
         ctx.save();
         ctx.fillStyle = color;
         ctx.strokeStyle = color;
@@ -2169,6 +2280,11 @@
             ctx.stroke();
           }
         }
+        if (dotted) {
+          ctx.beginPath();
+          ctx.arc(x + 9, topY + 2 * spacing - spacing * 0.5, 1.8, 0, Math.PI * 2);
+          ctx.fill();
+        }
         ctx.restore();
       }
 
@@ -2178,21 +2294,26 @@
         const noteColor = grp.isActive ? "#C62828" : "#1E1410";
 
         if (grp.isRestOnly) {
-          drawCanvasRest(grp.x, trebleTopY, lineSpacing, grp.durationQuarter, noteColor);
+          const restTopY = grp.staff === 2 ? bassTopY : trebleTopY;
+          const hasOtherVoice = chordGroups.some((g) =>
+            g !== grp && g.staff === grp.staff && !g.isRestOnly &&
+            Math.abs(g.startQuarter - grp.startQuarter) < 0.01);
+          const restShift = hasOtherVoice ? (grp.voice === "1" ? -1 : 1) * lineSpacing * 1.6 : 0;
+          drawCanvasRest(grp.x, restTopY + restShift, lineSpacing, grp.baseDur, noteColor, grp.isDotted);
           return;
         }
 
-        const isHollow = grp.durationQuarter >= 1.95;
-        const isWhole = grp.durationQuarter >= 3.8;
+        const isHollow = grp.baseDur >= 2;
+        const isWhole = grp.baseDur >= 4;
 
         // Dòng kẻ phụ dưới E4 (<= 28) và trên F5 (>= 40)
         ctx.strokeStyle = "#4E342E";
         ctx.lineWidth = 1.2;
         grp.noteItems.forEach((item) => {
           const refBottom = item.isBass ? bassBottomY : trebleBottomY;
-          const refS = item.isBass ? 22 : 30;
-          if (item.diatonicStep <= refS - 4) { // Dòng kẻ phụ dưới
-            for (let st = refS - 4; st >= item.diatonicStep; st -= 2) {
+          const refS = item.isBass ? 18 : 30;
+          if (item.diatonicStep <= refS - 2) { // Dòng kẻ phụ dưới
+            for (let st = refS - 2; st >= item.diatonicStep; st -= 2) {
               const ly = refBottom - (st - refS) * (lineSpacing / 2);
               ctx.beginPath();
               ctx.moveTo(grp.x - rx - 4, ly);
@@ -2210,15 +2331,6 @@
             }
           }
         });
-        if (grp.highestStep >= 40) {
-          for (let st = 40; st <= grp.highestStep; st += 2) {
-            const ly = trebleBottomY - (st - 30) * (lineSpacing / 2);
-            ctx.beginPath();
-            ctx.moveTo(grp.x - rx - 4, ly);
-            ctx.lineTo(grp.x + rx + 4, ly);
-            ctx.stroke();
-          }
-        }
 
         // Vẽ đầu nốt, chấm dôi, dấu hóa, dấu nối (tie)
         grp.noteItems.forEach((item) => {
@@ -2241,7 +2353,7 @@
             ctx.fillText(item.acc === "#" ? "♯" : "♭", grp.x - rx - 2, item.y + 4);
           }
           if (item.raw.hasTieStart) {
-            const nextGrp = chordGroups[gIdx + 1];
+            const nextGrp = chordGroups.slice(gIdx + 1).find((g) => g.staff === grp.staff && g.voice === grp.voice && !g.isRestOnly);
             const endX = nextGrp ? nextGrp.x : grp.x + grp.durationQuarter * pxPerQuarter;
             if (endX > grp.x + 6) {
               ctx.beginPath();
@@ -2258,8 +2370,8 @@
         if (!beamedSet.has(grp) && !isWhole) {
           ctx.strokeStyle = noteColor;
           ctx.lineWidth = 1.5;
-          const is8th = grp.durationQuarter <= 0.55;
-          const is16th = grp.durationQuarter <= 0.3;
+          const is8th = grp.baseDur <= 0.5;
+          const is16th = grp.baseDur <= 0.25;
 
           if (grp.stemDown) {
             const stemX = grp.x - rx + 0.8;
@@ -2353,7 +2465,7 @@
         ctx.stroke();
 
         // Vạch dầm số 2 (nếu có nốt móc kép <= 0.3 phách như "quân Việt")
-        if (cluster.some((g) => g.durationQuarter <= 0.3)) {
+        if (cluster.some((g) => g.baseDur <= 0.25)) {
           const offset2 = stemDown ? -5.5 : 5.5;
           ctx.beginPath();
           ctx.moveTo(firstStemX - 0.5, beamStartY + offset2);
