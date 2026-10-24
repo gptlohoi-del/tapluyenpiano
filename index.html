@@ -457,6 +457,17 @@
         </div>
       </div>
 
+      <!-- Cài đặt: Độ cao ô nhạc (nốt rơi) -->
+      <div class="setting-row">
+        <div class="setting-row-inline">
+          <label for="noteHeightRange">📐 Độ cao ô nhạc (độ dài nốt rơi):</label>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <input type="range" id="noteHeightRange" min="0.5" max="3" step="0.05" value="1" style="cursor:pointer;" />
+            <span class="value-badge" id="noteHeightDisplay">100%</span>
+          </div>
+        </div>
+      </div>
+
       <!-- Cài đặt: Tốc độ BPM -->
       <div class="setting-row">
         <div class="setting-row-inline">
@@ -570,7 +581,8 @@
     /********************************************************************
      * 1. CÁC BIẾN TÙY CHỈNH & CẤU HÌNH MẶC ĐỊNH
      ********************************************************************/
-    const NOTE_HEIGHT_SCALE = 1;
+    let noteHeightScale = parseFloat(localStorage.getItem("piano_noteHeightScale") ?? "1.0");
+    if (isNaN(noteHeightScale)) noteHeightScale = 1.0;
     const LYRIC_FONT_SIZE = 14;
 
     let staffBannerHeight1 = parseInt(localStorage.getItem("piano_staffHeight1") ?? "55", 10);
@@ -2613,8 +2625,8 @@
         }
       });
 
-      const visibleQuarters = 4;
-      const pixelsPerQuarter = (fallingAreaHeight / visibleQuarters) * NOTE_HEIGHT_SCALE;
+      const visibleQuarters = 6;
+      const pixelsPerQuarter = (fallingAreaHeight / visibleQuarters) * noteHeightScale;
 
       if (songData) {
         ctx.strokeStyle = "rgba(109, 76, 65, 0.22)";
@@ -2998,6 +3010,16 @@
       staffBannerHeight2 = parseInt(e.target.value, 10);
       staffHeight2Display.textContent = `${staffBannerHeight2} px`;
       localStorage.setItem("piano_staffHeight2", String(staffBannerHeight2));
+    });
+
+    const noteHeightRange = document.getElementById("noteHeightRange");
+    const noteHeightDisplay = document.getElementById("noteHeightDisplay");
+    noteHeightRange.value = noteHeightScale;
+    noteHeightDisplay.textContent = `${Math.round(noteHeightScale * 100)}%`;
+    noteHeightRange.addEventListener("input", (e) => {
+      noteHeightScale = parseFloat(e.target.value);
+      noteHeightDisplay.textContent = `${Math.round(noteHeightScale * 100)}%`;
+      localStorage.setItem("piano_noteHeightScale", String(noteHeightScale));
     });
 
     const lyricBgOpacityRange = document.getElementById("lyricBgOpacityRange");
