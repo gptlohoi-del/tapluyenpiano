@@ -2000,15 +2000,39 @@
       const minVisibleQ = currentBeat - (playheadX / pxPerQuarter) - 2;
       const maxVisibleQ = currentBeat + ((width - playheadX) / pxPerQuarter) + 2;
 
-      const visibleSheetNotes = songData.rawSheetNotes.filter(
+      const lhSheetNotes = drawBass
+        ? activeNotes
+            .filter(n => n.hand === "lh" &&
+              n.startQuarter + n.durationQuarter >= minVisibleQ &&
+              n.startQuarter <= maxVisibleQ)
+            .map(n => {
+              const m = songData.measuresInfo.find(
+                mm => n.startQuarter >= mm.startQuarter - 0.02 &&
+                      n.startQuarter < mm.startQuarter + mm.durationQuarter - 0.02);
+              return {
+                isRest: false, staff: 2,
+                midi: n.midi - transposeSemitones,
+                startQuarter: n.startQuarter,
+                durationQuarter: Math.round(n.durationQuarter) >= 1 ? 1 : n.durationQuarter,
+                measureIndex: m ? m.index : 0,
+                beamState: "", isDotted: false, lyric: ""
+              };
+            })
+        : [];
+
+      // Nếu đang chọn chế độ chỉ tập tay phải thì ẩn nốt tay trái trên sheet
+      const activeLhNotes = handMode === "rh" ? [] : lhSheetNotes;
+      const allVisibleNotes = [...songData.rawSheetNotes, ...activeLhNotes].filter(
         (n) => n.startQuarter + n.durationQuarter >= minVisibleQ && n.startQuarter <= maxVisibleQ
       );
 
       const chordGroupsMap = new Map();
-      visibleSheetNotes.forEach((n) => {
-        const key = n.startQuarter.toFixed(3);
+      allVisibleNotes.forEach((n) => {
+        const staff = (n.staff === 2 || (n.hand === "lh")) ? 2 : 1;
+        const key = `${staff}_${n.startQuarter.toFixed(3)}`;
         if (!chordGroupsMap.has(key)) {
           chordGroupsMap.set(key, {
+            staff,
             startQuarter: n.startQuarter,
             durationQuarter: n.durationQuarter,
             measureIndex: n.measureIndex,
@@ -2041,9 +2065,9 @@
 
         grp.noteItems = pitchedNotes.map((n) => {
           const info = getSheetDiatonicInfo(n);
-          const isBass = n.midi < 60 && drawBass;
+          const isBass = grp.staff === 2 || (n.midi < 60 && drawBass);
           const targetBottomY = isBass ? bassBottomY : trebleBottomY;
-          const refStep = isBass ? 22 : 30; // G2/A2 -> Đổi chuẩn rọi Khóa Fa (A2 = 22 là khe 2 hoặc C3 = 22)
+          const refStep = isBass ? 18 : 30; // Sol2 = 18 (Khóa Fa dòng 1), E4 = 30 (Khóa Sol dòng 1)
           const y = targetBottomY - (info.diatonicStep - refStep) * (lineSpacing / 2);
           return { raw: n, diatonicStep: info.diatonicStep, acc: info.acc, y, isBass };
         }).sort((a, b) => a.diatonicStep - b.diatonicStep);
@@ -2054,7 +2078,8 @@
           grp.lowestStep = grp.noteItems[0].diatonicStep;
           grp.highestStep = grp.noteItems[grp.noteItems.length - 1].diatonicStep;
           const avgStep = (grp.lowestStep + grp.highestStep) / 2;
-          grp.stemDown = avgStep >= 34; // Dưới dòng 3 (B4) thì stemDown = false (đuôi quay lên)
+          const midStep = grp.noteItems[0].isBass ? 22 : 34; // Khóa Fa lật đuôi ở Re3 (22), Khóa Sol ở B4 (34)
+          grp.stemDown = avgStep >= midStep;
         }
       });
 
