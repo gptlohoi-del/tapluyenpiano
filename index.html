@@ -2163,15 +2163,28 @@
         // Dòng kẻ phụ dưới E4 (<= 28) và trên F5 (>= 40)
         ctx.strokeStyle = "#4E342E";
         ctx.lineWidth = 1.2;
-        if (grp.lowestStep <= 28) {
-          for (let st = 28; st >= grp.lowestStep; st -= 2) {
-            const ly = trebleBottomY - (st - 30) * (lineSpacing / 2);
-            ctx.beginPath();
-            ctx.moveTo(grp.x - rx - 4, ly);
-            ctx.lineTo(grp.x + rx + 4, ly);
-            ctx.stroke();
+        grp.noteItems.forEach((item) => {
+          const refBottom = item.isBass ? bassBottomY : trebleBottomY;
+          const refS = item.isBass ? 22 : 30;
+          if (item.diatonicStep <= refS - 4) { // Dòng kẻ phụ dưới
+            for (let st = refS - 4; st >= item.diatonicStep; st -= 2) {
+              const ly = refBottom - (st - refS) * (lineSpacing / 2);
+              ctx.beginPath();
+              ctx.moveTo(grp.x - rx - 4, ly);
+              ctx.lineTo(grp.x + rx + 4, ly);
+              ctx.stroke();
+            }
           }
-        }
+          if (item.diatonicStep >= refS + 10) { // Dòng kẻ phụ trên
+            for (let st = refS + 10; st <= item.diatonicStep; st += 2) {
+              const ly = refBottom - (st - refS) * (lineSpacing / 2);
+              ctx.beginPath();
+              ctx.moveTo(grp.x - rx - 4, ly);
+              ctx.lineTo(grp.x + rx + 4, ly);
+              ctx.stroke();
+            }
+          }
+        });
         if (grp.highestStep >= 40) {
           for (let st = 40; st <= grp.highestStep; st += 2) {
             const ly = trebleBottomY - (st - 30) * (lineSpacing / 2);
