@@ -573,8 +573,8 @@
     const NOTE_HEIGHT_SCALE = 0.85;
     const LYRIC_FONT_SIZE = 14;
 
-    let staffBannerHeight1 = parseInt(localStorage.getItem("piano_staffHeight1") ?? "86", 10);
-    let staffBannerHeight2 = parseInt(localStorage.getItem("piano_staffHeight2") ?? "140", 10);
+    let staffBannerHeight1 = parseInt(localStorage.getItem("piano_staffHeight1") ?? "55", 10);
+    let staffBannerHeight2 = parseInt(localStorage.getItem("piano_staffHeight2") ?? "95", 10);
 
     let lyricBgOpacity = parseFloat(localStorage.getItem("piano_lyricBgOpacity") ?? "0.7");
     let lyricTextOpacity = parseFloat(localStorage.getItem("piano_lyricTextOpacity") ?? "1.0");
@@ -1908,6 +1908,14 @@
 
     function drawScrollingSheetStaff(width, bannerHeight) {
       ctx.save();
+
+      // THÊM 2 DÒNG NÀY ĐỂ NỐT NÀO VƯỢT QUÁ KHUNG KHUÔNG NHẠC SẼ TỰ ĐỘNG BỊ CẮT BỎ (KHÔNG TRÀN XUỐNG DƯỚI)
+      ctx.beginPath();
+      ctx.rect(0, 0, width, bannerHeight);
+      ctx.clip();
+
+
+
       ctx.fillStyle = "#FDF9F1";
       ctx.fillRect(0, 0, width, bannerHeight);
 
